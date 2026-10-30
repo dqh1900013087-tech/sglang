@@ -981,7 +981,6 @@ class NPUMLATokenToKVPool(MLATokenToKVPool):
             index_k.reshape(-1, self.index_head_dim).contiguous(),
             index_k_scale.reshape(-1).contiguous(),
             self.index_page_size,
-            skip_slot_zero=True,
         )
 
     def _get_disagg_buffer_entries(self):

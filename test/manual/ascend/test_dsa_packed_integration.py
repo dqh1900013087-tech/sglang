@@ -65,7 +65,11 @@ def test_write_padding_boundaries_and_overwrite():
                 page, offset = divmod(slot, 128)
                 expected[page, offset * 128 : (offset + 1) * 128] = k.view(torch.uint8).cpu()[i]
                 expected[page, 128 * 128 + offset * 4 : 128 * 128 + (offset + 1) * 4] = s.view(torch.uint8).cpu()[i * 4 : (i + 1) * 4]
-        same(p.get_index_k_with_scale_buffer(2), expected)
+        actual = p.get_index_k_with_scale_buffer(2).cpu()
+        # Duplicate padding writes may change only slot 0's K and scale.
+        actual[0, :128] = expected[0, :128]
+        actual[0, 16384:16388] = expected[0, 16384:16388]
+        same(actual, expected)
     assert torch.all(p.get_index_k_with_scale_buffer(0).cpu() == 165)
 
 
@@ -92,9 +96,10 @@ def test_cpu_restore():
                 same(restored[page, start:start + width], original_index[slot, page, start:start + width])
 
 
-def test_writer_graph_replay_with_padding():
+@pytest.mark.parametrize("loc_dtype", [torch.int32, torch.int64])
+def test_writer_graph_replay_with_padding(loc_dtype):
     p = pool()
-    loc = torch.tensor([128, 129, 0, 0], device="npu")
+    loc = torch.tensor([128, 129, 0, 0], device="npu", dtype=loc_dtype)
     k, s = values(4)
     # Warm up Triton compilation before recording the static writer graph.
     p.set_index_k_scale_buffer(0, loc, k, s)
@@ -115,7 +120,10 @@ def test_writer_graph_replay_with_padding():
                 page, slot = divmod(pos, 128)
                 same(keys[page, slot], k.view(torch.uint8)[i])
                 same(scales[page, slot], s.view(torch.uint8)[i*4:(i+1)*4])
-        same(p.index_k_buffer[0, 0], before[0, 0])
+        page_zero = p.index_k_buffer[0, 0].cpu()
+        before_zero = before[0, 0].cpu()
+        same(page_zero[128:16384], before_zero[128:16384])
+        same(page_zero[16388:], before_zero[16388:])
         same(p.index_k_buffer[1], before[1])
 
 
@@ -125,6 +133,10 @@ def test_pool_writer_to_packed_reader(qlen):
     k, s = values(512)
     loc = torch.arange(128, 640, device="npu")
     p.set_index_k_scale_buffer(0, loc, k, s)
+    # Dummy writes to page 0 must not affect scores for real pages 1..4.
+    p.set_index_k_scale_buffer(
+        0, torch.zeros(3, dtype=torch.int32, device="npu"), *values(3)
+    )
     q, qs = values(qlen * 64)
     q, qs = q.reshape(qlen, 64, 128), qs.reshape(qlen, 64)
     w = torch.rand(qlen, 64, device="npu", dtype=torch.bfloat16)

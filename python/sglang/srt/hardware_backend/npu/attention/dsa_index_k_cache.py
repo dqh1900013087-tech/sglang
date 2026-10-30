@@ -5,37 +5,10 @@ This module requires Triton Ascend; it does not perform quantization.
 """
 
 import torch
-import triton
-import triton.language as tl
 
-
-@triton.jit
-def _set_k_and_s_npu_kernel(
-    cache_fp8,
-    cache_floats,
-    locations,
-    key_fp8,
-    scales,
-    PAGE_SIZE: tl.constexpr,
-    SKIP_SLOT_ZERO: tl.constexpr,
-):
-    token = tl.program_id(0)
-    # Use 64-bit address arithmetic even when locations are supplied as int32.
-    location = tl.load(locations + token).to(tl.int64)
-    # NPU graph replay pads multiple tokens with the reserved physical slot 0.
-    # Mask those stores without compacting tensors or synchronizing the device.
-    valid = location != 0 if SKIP_SLOT_ZERO else True
-    page = location // PAGE_SIZE
-    slot = location % PAGE_SIZE
-    columns = tl.arange(0, 128)
-    key = tl.load(key_fp8 + token.to(tl.int64) * 128 + columns)
-    scale = tl.load(scales + token)
-
-    key_offset = page * (PAGE_SIZE * 132) + slot * 128 + columns
-    # FP8 elements occupy one byte; scale offsets are in FP32 elements.
-    scale_offset = page * (PAGE_SIZE * 33) + PAGE_SIZE * 32 + slot
-    tl.store(cache_fp8 + key_offset, key, mask=valid)
-    tl.store(cache_floats + scale_offset, scale, mask=valid)
+from sglang.kernels.ops.kvcache.dsa_index_k_cache import (
+    _set_k_and_s_triton_kernel,
+)
 
 
 def set_index_k_scale_buffer_npu(
@@ -44,8 +17,6 @@ def set_index_k_scale_buffer_npu(
     index_k: torch.Tensor,
     index_k_scale: torch.Tensor,
     page_size: int,
-    *,
-    skip_slot_zero: bool = False,
 ) -> None:
     """Write K and scale in place with one Triton kernel launch.
 
@@ -56,13 +27,12 @@ def set_index_k_scale_buffer_npu(
         index_k_scale: Contiguous float32 [T] or [T, 1].
         page_size: Tokens per page; 16..1024, divisible by 16, matching
             the packed Ascend 950 quant_lightning_indexer reader.
-        skip_slot_zero: Ignore dummy writes to reserved slot 0 during SGLang
-            graph capture/replay. Other locations must remain unique and valid.
 
-    All tensors must be on the same NPU. Locations must be unique and in
-    [0, num_pages * page_size); padding/duplicate slots must be filtered by
-    the caller. These value constraints are not checked here to avoid a
-    device synchronization. Inputs must not alias the output cache.
+    All tensors must be on the same NPU. Locations must be in
+    [0, num_pages * page_size), with unique nonzero locations. Padding tokens
+    may write the reserved slot 0; its contents are unspecified and must not
+    be used as valid cached data. These value constraints are not checked here
+    to avoid a device synchronization. Inputs must not alias the output cache.
 
     K is loaded and stored as FP8, matching the GPU writer's pointer types.
     Both cache views alias the same allocation. No packing temporary or
@@ -98,12 +68,18 @@ def set_index_k_scale_buffer_npu(
     if num_tokens == 0:
         return
 
-    _set_k_and_s_npu_kernel[(num_tokens,)](
+    # Call the existing kernel directly, bypassing the CUDA page-size wrapper.
+    loc = loc.to(torch.int64)
+    _set_k_and_s_triton_kernel[(num_tokens,)](
         cache.view(torch.float8_e4m3fn),
         cache.view(torch.float32),
         loc,
         index_k,
         index_k_scale,
+        index_k.stride(0),
         PAGE_SIZE=page_size,
-        SKIP_SLOT_ZERO=skip_slot_zero,
+        BUF_NUMEL_PER_PAGE=cache.shape[1],
+        NUM_K_ELEMS_PER_TOKEN=index_k.shape[1],
+        S_OFFSET_NBYTES_IN_PAGE=page_size * index_k.shape[1],
+        PRESHUFFLE_TILE=0,
     )
