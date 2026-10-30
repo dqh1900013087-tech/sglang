@@ -1213,48 +1213,6 @@ class NPUMLATokenToKVPool(MLATokenToKVPool):
             packed[:, key_bytes:].view(pages, self.index_page_size, 4),
         )
 
-    def move_kv_cache(self, tgt_loc: torch.Tensor, src_loc: torch.Tensor):
-        """Relocate native MLA rows and replicated index keys in the same operation."""
-        if tgt_loc.numel() == 0:
-            return
-        # Select matching source/destination rows before localizing DCP slots.
-        if self.dcp_size > 1 and not self.is_draft_worker:
-            target = localize_dcp_indices(
-                tgt_loc, self.dcp_size, self.dcp_rank, self.page_size
-            )
-            source = localize_dcp_indices(
-                src_loc, self.dcp_size, self.dcp_rank, self.page_size
-            )
-            if not torch.equal(target >= 0, source >= 0):
-                raise NotImplementedError(
-                    "Moving NPU MLA KV across DCP ranks requires a cross-rank transfer"
-                )
-            valid = (target >= 0) & (source >= 0)
-            target, source = target[valid].long(), source[valid].long()
-        else:
-            target, source = tgt_loc.long(), src_loc.long()
-        for buffers in (self.k_buffer, self.v_buffer):
-            if buffers is None:
-                continue
-            for buffer in buffers:
-                rows = buffer.flatten(0, 1)
-                if rows.dtype == torch.float8_e4m3fn:
-                    rows = rows.view(torch.uint8)
-                rows[target] = rows[source]
-        if self.index_k_buffer is None:
-            return
-        if self.dsa_kv_cache_store_fp8 and self.num_indexer_layers > 0:
-            dst_page, dst_slot = tgt_loc // self.index_page_size, tgt_loc % self.index_page_size
-            src_page, src_slot = src_loc // self.index_page_size, src_loc % self.index_page_size
-            for layer_id in self.indexer_layer_ids:
-                keys, scales = self._packed_index_byte_views(layer_id)
-                keys[dst_page, dst_slot] = keys[src_page, src_slot]
-                scales[dst_page, dst_slot] = scales[src_page, src_slot]
-        else:
-            for buffer in self.index_k_buffer:
-                rows = buffer.flatten(0, 1)
-                rows[tgt_loc.long()] = rows[src_loc.long()]
-
     def get_cpu_copy(self, indices, mamba_indices=None, req_pool_index=None):
         torch.npu.synchronize()
         buf_of_layers = [

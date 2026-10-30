@@ -69,7 +69,7 @@ def test_write_padding_boundaries_and_overwrite():
     assert torch.all(p.get_index_k_with_scale_buffer(0).cpu() == 165)
 
 
-def test_move_and_cpu_restore():
+def test_cpu_restore():
     p = pool()
     p.cpu_offloading_chunk_size = 2
     loc = torch.tensor([128, 129, 255, 256], device="npu")
@@ -90,21 +90,6 @@ def test_move_and_cpu_restore():
             page, off = divmod(pos, 128)
             for start, width in ((off * 128, 128), (16384 + off * 4, 4)):
                 same(restored[page, start:start + width], original_index[slot, page, start:start + width])
-    before = p.index_k_buffer.clone()
-    before_k = p.k_buffer.view(torch.uint8).clone()
-    # Overlapping move must read all source rows before assigning destinations.
-    dst, src = loc[1:], loc[:-1]
-    p.move_kv_cache(dst, src)
-    for layer in range(3):
-        same(p.k_buffer[layer].view(torch.uint8).flatten(0, 1)[dst], before_k[layer].flatten(0, 1)[src])
-    for slot, layer in enumerate(p.indexer_layer_ids):
-        expected = before[slot].cpu()
-        for d, s in zip(dst.cpu().tolist(), src.cpu().tolist()):
-            dp, ds = divmod(d, 128)
-            sp, ss = divmod(s, 128)
-            for base, width in ((0, 128), (16384, 4)):
-                expected[dp, base+ds*width:base+(ds+1)*width] = before[slot, sp, base+ss*width:base+(ss+1)*width].cpu()
-        same(p.get_index_k_with_scale_buffer(layer), expected)
 
 
 def test_writer_graph_replay_with_padding():
