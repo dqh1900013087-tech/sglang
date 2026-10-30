@@ -11,10 +11,10 @@ import triton.language as tl
 
 @triton.jit
 def _set_k_and_s_npu_kernel(
-    cache_bytes,
+    cache_fp8,
     cache_floats,
     locations,
-    key_bytes,
+    key_fp8,
     scales,
     PAGE_SIZE: tl.constexpr,
     SKIP_SLOT_ZERO: tl.constexpr,
@@ -28,13 +28,13 @@ def _set_k_and_s_npu_kernel(
     page = location // PAGE_SIZE
     slot = location % PAGE_SIZE
     columns = tl.arange(0, 128)
-    key = tl.load(key_bytes + token.to(tl.int64) * 128 + columns)
+    key = tl.load(key_fp8 + token.to(tl.int64) * 128 + columns)
     scale = tl.load(scales + token)
 
     key_offset = page * (PAGE_SIZE * 132) + slot * 128 + columns
-    # cache_floats is an alias of cache_bytes: offsets are FP32 elements.
+    # FP8 elements occupy one byte; scale offsets are in FP32 elements.
     scale_offset = page * (PAGE_SIZE * 33) + PAGE_SIZE * 32 + slot
-    tl.store(cache_bytes + key_offset, key, mask=valid)
+    tl.store(cache_fp8 + key_offset, key, mask=valid)
     tl.store(cache_floats + scale_offset, scale, mask=valid)
 
 
@@ -64,7 +64,7 @@ def set_index_k_scale_buffer_npu(
     the caller. These value constraints are not checked here to avoid a
     device synchronization. Inputs must not alias the output cache.
 
-    K is reinterpreted as uint8, not converted: its FP8 bits are preserved.
+    K is loaded and stored as FP8, matching the GPU writer's pointer types.
     Both cache views alias the same allocation. No packing temporary or
     quantization is performed. Unwritten slots are left unchanged.
     """
@@ -99,10 +99,10 @@ def set_index_k_scale_buffer_npu(
         return
 
     _set_k_and_s_npu_kernel[(num_tokens,)](
-        cache,
+        cache.view(torch.float8_e4m3fn),
         cache.view(torch.float32),
         loc,
-        index_k.view(torch.uint8),
+        index_k,
         index_k_scale,
         PAGE_SIZE=page_size,
         SKIP_SLOT_ZERO=skip_slot_zero,
