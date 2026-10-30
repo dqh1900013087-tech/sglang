@@ -967,6 +967,8 @@ class NPUMLATokenToKVPool(MLATokenToKVPool):
             set_index_k_scale_buffer_npu,
         )
 
+        if not (self.dsa_kv_cache_store_fp8 and self.num_indexer_layers > 0):
+            raise RuntimeError("Packed index cache requires an FP8 DSA indexer layer")
         maybe_detect_oob(
             loc,
             0,
@@ -974,7 +976,7 @@ class NPUMLATokenToKVPool(MLATokenToKVPool):
             "set_index_k_scale_buffer (NPU DSA packed, allocator-global loc)",
         )
         set_index_k_scale_buffer_npu(
-            self.get_index_k_with_scale_buffer(layer_id),
+            self.index_k_buffer[self._get_indexer_slot(layer_id)],
             loc.reshape(-1).contiguous(),
             index_k.reshape(-1, self.index_head_dim).contiguous(),
             index_k_scale.reshape(-1).contiguous(),
