@@ -202,7 +202,7 @@ class MLATokenToKVPoolHost(HiSparseHostPoolMixin, HostKVCache):
                 index_layers = len(native.index_layer_indices)
                 if layout == "page_first_kv_split" and native.index_k is not None:
                     self._size_per_token += (
-                        native.index_width * native.index_k.element_size() * index_layers
+                        native.index_width * native.index_k.itemsize * index_layers
                     )
                     if native.index_scales is not None:
                         self._size_per_token += 4 * index_layers
@@ -379,7 +379,7 @@ class MLATokenToKVPoolHost(HiSparseHostPoolMixin, HostKVCache):
                         * self.page_size
                         * num_indexer_layers
                         * native.index_width
-                        * native.index_k.element_size()
+                        * native.index_k.itemsize
                     )
                 if native.index_scales is not None:
                     # FP32 scale mirror
