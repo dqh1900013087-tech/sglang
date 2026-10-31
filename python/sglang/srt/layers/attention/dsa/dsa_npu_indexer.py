@@ -305,10 +305,10 @@ class DSANPUIndexerMixin:
             )
             if is_prefill:
                 block_table = block_table[: actual_seq_lengths_q.size()[0]]
-            # Import registers the npu::sgl_quant_lightning_indexer_packed schema.
-            from sgl_kernel_npu import quant_lightning_indexer_packed
+            # Load the native library and register the packed QLI operator.
+            import sgl_kernel_npu  # noqa: F401
 
-            topk_indices = quant_lightning_indexer_packed(
+            topk_indices = torch.ops.npu.sgl_quant_lightning_indexer_packed(
                 query.contiguous(),
                 past_key_states,
                 weights.contiguous(),
