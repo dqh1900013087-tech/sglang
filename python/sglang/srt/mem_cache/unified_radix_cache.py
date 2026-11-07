@@ -2913,11 +2913,44 @@ class UnifiedRadixCache(BasePrefixCache):
                 pool_page_size = (
                     entry.host_pool.page_size if entry is not None else self.page_size
                 )
-                num_tokens = min(len(transfer.keys or ()), hit_pages) * pool_page_size
+                planned_pages = len(transfer.keys or ())
+                num_pages = min(planned_pages, hit_pages)
+                if transfer.hit_policy == PoolHitPolicy.BLOCK_GROUPS:
+                    # Keys count component pages, while hit_pages counts FULL
+                    # pages. Convert before allocating: trimming the buffer at
+                    # read time cannot undo an unnecessary allocation failure.
+                    block_pages = max(1, int(transfer.block_pages))
+                    legacy_pages = num_pages
+                    num_pages = min(planned_pages, hit_pages // block_pages)
+                    if num_pages != legacy_pages:
+                        logger.info(
+                            "HiCache BLOCK_GROUPS staging corrected: "
+                            "request_id=%s pool=%s hit_tokens=%d full_hit_pages=%d "
+                            "planned_pool_pages=%d block_pages=%d slots_per_page=%d "
+                            "legacy_slots=%d requested_slots=%d avoided_slots=%d",
+                            info.operation.request_id,
+                            transfer.name,
+                            hit_tokens,
+                            hit_pages,
+                            planned_pages,
+                            block_pages,
+                            pool_page_size,
+                            legacy_pages * pool_page_size,
+                            num_pages * pool_page_size,
+                            (legacy_pages - num_pages) * pool_page_size,
+                        )
+                num_tokens = num_pages * pool_page_size
                 if num_tokens == 0:
                     continue
                 host_indices = self.components[ct].alloc_prefetch_staging(num_tokens)
                 if host_indices is None:
+                    logger.info(
+                        "HiCache auxiliary staging allocation failed: "
+                        "request_id=%s pool=%s requested_slots=%d",
+                        info.operation.request_id,
+                        transfer.name,
+                        num_tokens,
+                    )
                     if (
                         self.enable_storage_metrics
                         and self.storage_metrics_collector is not None
