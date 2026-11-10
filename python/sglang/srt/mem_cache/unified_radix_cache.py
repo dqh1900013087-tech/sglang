@@ -2901,6 +2901,19 @@ class UnifiedRadixCache(BasePrefixCache):
             host_indices[:completed_tokens],
             hash_value[: completed_tokens // self.page_size],
         )
+        if envs.SGLANG_DEBUG_C128_PREFETCH.get() and ComponentType.C128 in comp_xfers:
+            logger.info(
+                "C128_PREFETCH_DIAG phase=insert_host rid=%s anchor_id=%s "
+                "inserted_host_node=%s completed_tokens=%d "
+                "insert_total_len=%d duplicate_prefix_len=%d dropped=%s",
+                operation.request_id,
+                last_host_node_id,
+                insert_result.inserted_host_node,
+                completed_tokens,
+                insert_result.total_len,
+                insert_result.prefix_len,
+                insert_result.host_insert_dropped,
+            )
 
         # Apply the host-insert walk's actions before the transfer commit.
         self._apply_cache_actions(insert_result.cache_actions)
@@ -3003,6 +3016,40 @@ class UnifiedRadixCache(BasePrefixCache):
             transfer.keys is not None and count == len(transfer.keys)
             for transfer, count in zip(pool_transfers, pool_hit_pages)
         )
+        if envs.SGLANG_DEBUG_C128_PREFETCH.get():
+            for transfer in pool_transfers:
+                if (
+                    transfer.name == PoolName.DEEPSEEK_V4_C128
+                    and transfer.hit_policy == PoolHitPolicy.BLOCK_GROUPS
+                ):
+                    group_tokens = max(1, int(transfer.block_pages)) * self.page_size
+                    logger.info(
+                        "C128_PREFETCH_DIAG phase=result rid=%s "
+                        "storage_start=%d expected_tokens=%d completed_tokens=%d "
+                        "end_mod_group=%d sidecar_hit_pages=%d "
+                        "has_saved_sidecar_range=%s planned_c128_keys=%d "
+                        "loaded_c128_objects=%d host_slots=%d all_succeeded=%s "
+                        "buffer_mode=%s assume_stored=%s pools=%s",
+                        operation.request_id,
+                        operation.storage_start,
+                        expected_tokens,
+                        completed_tokens,
+                        (operation.storage_start + completed_tokens) % group_tokens,
+                        operation.sidecar_hit_pages,
+                        operation.sidecar_hash_values is not None,
+                        len(transfer.keys or ()),
+                        hit_pages.get(transfer.name, 0),
+                        transfer.host_indices.numel()
+                        if transfer.host_indices is not None
+                        else 0,
+                        all_succeeded,
+                        self.buffer_pipeline is not None,
+                        operation.assume_stored,
+                        [
+                            (str(t.name), len(t.keys or ()), count)
+                            for t, count in zip(pool_transfers, pool_hit_pages)
+                        ],
+                    )
         if pool_transfers and not all_succeeded:
             # Drop each pool's beliefs beyond what it served (KV and its
             # sidecars beyond the completed span); the next insert re-writes

@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
 import torch
 
+from sglang.srt.environ import envs
 from sglang.srt.managers.cache_controller import (
     CacheOperation,
 )
@@ -1614,6 +1615,31 @@ class HybridCacheController(BaseHiCacheController):
             )
 
         kv_hit_pages = hit_result.kv_hit_pages
+        if envs.SGLANG_DEBUG_C128_PREFETCH.get():
+            for transfer in operation.pool_transfers or ():
+                if (
+                    transfer.name == PoolName.DEEPSEEK_V4_C128
+                    and transfer.hit_policy == PoolHitPolicy.BLOCK_GROUPS
+                ):
+                    block = max(1, int(transfer.block_pages))
+                    start = operation.storage_start
+                    end = start + kv_hit_pages * self.page_size
+                    logger.info(
+                        "C128_PREFETCH_DIAG phase=query rid=%s "
+                        "storage_start=%d query_pages=%d kv_hit_pages=%d "
+                        "start_mod_group=%d end_mod_group=%d "
+                        "block_pages=%d planned_c128_keys=%d "
+                        "raw_c128_query_verdict=%d",
+                        operation.request_id,
+                        start,
+                        len(hash_value),
+                        kv_hit_pages,
+                        start % (block * self.page_size),
+                        end % (block * self.page_size),
+                        block,
+                        len(transfer.keys or ()),
+                        hit_result.extra_pool_hit_pages.get(transfer.name, 0),
+                    )
         operation.pool_storage_result.update_kv_hit_pages(kv_hit_pages)
         operation.pool_storage_result.restorable_prefix_pages = (
             hit_result.restorable_prefix_pages

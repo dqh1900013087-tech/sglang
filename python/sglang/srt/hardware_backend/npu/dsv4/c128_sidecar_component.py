@@ -6,10 +6,12 @@ radix tree; partial tail pages remain request-owned.
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Callable, Optional, Sequence
 
 import torch
 
+from sglang.srt.environ import envs
 from sglang.srt.mem_cache.base_prefix_cache import (
     InsertParams,
     InsertResult,
@@ -45,6 +47,9 @@ if TYPE_CHECKING:
     )
     from sglang.srt.mem_cache.unified_cache.unified_tree_core import UnifiedTreeNode
     from sglang.srt.mem_cache.unified_cache.unified_tree_core_interface import NodeId
+
+
+logger = logging.getLogger(__name__)
 
 
 class C128SidecarComponent(TreeComponent):
@@ -156,6 +161,20 @@ class C128SidecarComponent(TreeComponent):
         if self._c128_kv_pool_host is None:
             return PreparePrefetchResult()
         blocks = prefetch_tokens // self._group_tokens()
+        if envs.SGLANG_DEBUG_C128_PREFETCH.get():
+            start = self._node_depth(self.tree_core.node_by_id(node_id))
+            logger.info(
+                "C128_PREFETCH_DIAG phase=plan anchor_id=%s "
+                "anchor_tokens=%d prefetch_tokens=%d group_tokens=%d "
+                "start_mod_group=%d candidate_end_mod_group=%d planned_blocks=%d",
+                node_id,
+                start,
+                prefetch_tokens,
+                self._group_tokens(),
+                start % self._group_tokens(),
+                (start + prefetch_tokens) % self._group_tokens(),
+                blocks,
+            )
         if blocks == 0:
             return PreparePrefetchResult()
         return PreparePrefetchResult(staging_tokens=blocks * self._group_tokens())
@@ -204,11 +223,27 @@ class C128SidecarComponent(TreeComponent):
             and insert_result.inserted_host_node is not None
             else None
         )
-        if (
-            target is None
-            or blocks_required == 0
-            or loaded_blocks < blocks_required
-        ):
+        if envs.SGLANG_DEBUG_C128_PREFETCH.get():
+            target_end = self._node_depth(target) if target is not None else -1
+            logger.info(
+                "C128_PREFETCH_DIAG phase=commit_decision target_id=%s "
+                "target_tokens=%d end_mod_group=%d group_tokens=%d "
+                "host_slots=%d slots_per_page=%d slot_remainder=%d "
+                "required_objects=%d loaded_objects=%d existing_host=%s",
+                target.id if target is not None else None,
+                target_end,
+                target_end % self._group_tokens() if target is not None else -1,
+                self._group_tokens(),
+                host_indices.numel(),
+                kernel_page_size,
+                host_indices.numel() % kernel_page_size,
+                blocks_required,
+                loaded_blocks,
+                target.component_data[ct].host_value is not None
+                if target is not None
+                else False,
+            )
+        if target is None or blocks_required == 0 or loaded_blocks < blocks_required:
             cache_actions.append(
                 FreeComponentHostSlot([host_indices], component_type=ct)
             )
@@ -217,6 +252,22 @@ class C128SidecarComponent(TreeComponent):
         if cd.host_value is None:
             # Publish the fetched slots on the node and refresh eviction state.
             cd.host_value = host_indices[: blocks_required * kernel_page_size].clone()
+            if envs.SGLANG_DEBUG_C128_PREFETCH.get():
+                target_end = self._node_depth(target)
+                remainder = target_end % self._group_tokens()
+                log = logger.warning if remainder else logger.info
+                log(
+                    "C128_PREFETCH_DIAG phase=publish target_id=%s "
+                    "target_tokens=%d group_tokens=%d end_mod_group=%d "
+                    "published_slots=%d published_objects=%d unaligned=%s",
+                    target.id,
+                    target_end,
+                    self._group_tokens(),
+                    remainder,
+                    cd.host_value.numel(),
+                    blocks_required,
+                    bool(remainder),
+                )
             host_lru = self.tree_core.host_lru_lists[ct]
             if cd.value is None and not host_lru.in_list(target):
                 host_lru.insert_mru(target)
@@ -236,8 +287,26 @@ class C128SidecarComponent(TreeComponent):
         def _valid(node: UnifiedTreeNode) -> bool:
             cd = node.component_data[self.component_type]
             if match_device_only:
-                return cd.value is not None
-            return cd.value is not None or cd.host_value is not None
+                valid = cd.value is not None
+            else:
+                valid = cd.value is not None or cd.host_value is not None
+            if valid and envs.SGLANG_DEBUG_C128_PREFETCH.get():
+                end = self._node_depth(node)
+                if end % self._group_tokens():
+                    logger.warning(
+                        "C128_PREFETCH_DIAG phase=match_validator node_id=%s "
+                        "node_tokens=%d group_tokens=%d end_mod_group=%d "
+                        "accepted=True device_only=%s host_present=%s "
+                        "device_present=%s",
+                        node.id,
+                        end,
+                        self._group_tokens(),
+                        end % self._group_tokens(),
+                        match_device_only,
+                        cd.host_value is not None,
+                        cd.value is not None,
+                    )
+            return valid
 
         return _valid
 
