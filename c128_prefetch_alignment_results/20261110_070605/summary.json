@@ -1,0 +1,43 @@
+{
+  "status": "BUG_REPRODUCED",
+  "branch": "debug-c128-prefetch-alignment",
+  "commit": "94ece9916754a44c732ec70df0ea2c0d33ef44b2",
+  "working_tree_change": "Test used a CPU barrier before HCCL prewarm; the source change and patch are excluded from this evidence commit.",
+  "model": "DeepSeek-V4-Flash",
+  "tp": 4,
+  "attention_dp": 4,
+  "routed_dp_rank": 0,
+  "mtp_enabled": false,
+  "page_size": 128,
+  "host_memory_mode": "cache",
+  "mf_version": "1.3.1",
+  "seed_input_tokens": 8193,
+  "successful_http_requests": 4,
+  "failed_request": "root_6016-b1ae4871",
+  "failed_input_tokens": 6017,
+  "restored_tokens": 6016,
+  "c128_objects_loaded": 2,
+  "c128_covered_tokens": 4096,
+  "unaligned_publish": true,
+  "target_node_id": 109,
+  "match_validator_accepted": true,
+  "subsequent_unaligned_query_start_verified": false,
+  "assertion": "AssertionError: req.kv.cache_protected_len=6016, len(new_indices)=4096, page_aligned_len=4096",
+  "not_run_due_to_crash": [
+    "root_6144",
+    "retained_prefix_cases",
+    "exact_length_seed_replay_cases"
+  ],
+  "sglang_status": "exited after assertion; port 8001 refused",
+  "mooncake_master_status": "still running, metrics 9004 returned 200",
+  "notes": [
+    "Native input_ids and unique cache_salt; one generated token; no accuracy claim",
+    "6016 case had no successful HTTP response; L3 restoration proven by query/result/publish logs",
+    "Test process finished/stopped after scheduler crash; no automatic redeployment after failure"
+  ],
+  "run_dir": "/home/dqh/c128_validation/20261110_070605",
+  "effective_chunked_prefill_size": 128,
+  "requested_chunked_prefill_size": 512,
+  "dp_size": 1,
+  "dependency_added": "deepseek-recipe==0.2.0"
+}

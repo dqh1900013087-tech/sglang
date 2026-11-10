@@ -1,0 +1,5 @@
+{
+  "SGLANG_DEBUG_C128_PREFETCH": "1",
+  "LOG_DIR": "/home/dqh/c128_validation/20261110_070605",
+  "SGLANG_EXTRA_ARGS": "--hicache-host-memory-mode cache --log-level info"
+}

@@ -1,0 +1,35 @@
+{
+  "text": "\n\n",
+  "output_ids": [
+    271
+  ],
+  "meta_info": {
+    "id": "root_4224-742e568f",
+    "finish_reason": {
+      "type": "length",
+      "length": 1
+    },
+    "prompt_tokens": 4225,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "reasoning_tokens": 0,
+    "completion_tokens": 1,
+    "cached_tokens": 4096,
+    "weight_versions": [
+      {
+        "version": "default",
+        "start": 0,
+        "end": 1
+      }
+    ],
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4096,
+      "storage_backend": "MooncakeStore"
+    },
+    "dp_rank": 0,
+    "e2e_latency": 1.3748506599949906,
+    "response_sent_to_client_ts": 1794295268.6409302
+  }
+}

@@ -1,0 +1,10 @@
+==> DIR=/mnt/share/d00934833/mooncake
+==> SGL_ROOT=/workspace/sglang
+==> MF_PROTOCOL=device_urma  store_protocol=tcp  devices=4,5,6,7  tp=4  dp=4
+==> chunked=512  page_size=128  mem_fraction=0.72  max_prefill=65536
+==> master=127.0.0.1:50052  server=:8001  model=/mnt/share/weight/DeepSeek-V4-Flash
+==> SGLANG_EXTRA_ARGS=--hicache-host-memory-mode cache --log-level info
+up
+==> mooncake master 已在端口 50052 运行，复用
+==> sglang pid=16894  port=8001  log=/home/dqh/c128_validation/20261110_070605/server.log
+==> 等待就绪（3-10 分钟）: curl -s http://127.0.0.1:8001/ready

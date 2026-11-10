@@ -1,0 +1,672 @@
+# HELP mooncake_process_rss_bytes Resident set size of the process
+# TYPE mooncake_process_rss_bytes gauge
+mooncake_process_rss_bytes 13729792
+# HELP mooncake_process_rss_peak_bytes Peak resident set size since process start
+# TYPE mooncake_process_rss_peak_bytes gauge
+mooncake_process_rss_peak_bytes 13729792
+# HELP mooncake_process_rss_anon_bytes Resident anonymous memory of the process
+# TYPE mooncake_process_rss_anon_bytes gauge
+mooncake_process_rss_anon_bytes 4218880
+# HELP mooncake_process_rss_file_bytes Resident file-backed memory of the process
+# TYPE mooncake_process_rss_file_bytes gauge
+mooncake_process_rss_file_bytes 9510912
+# HELP mooncake_process_rss_shmem_bytes Resident shared memory of the process
+# TYPE mooncake_process_rss_shmem_bytes gauge
+mooncake_process_rss_shmem_bytes 0
+# HELP mooncake_process_vsize_bytes Virtual address space size of the process
+# TYPE mooncake_process_vsize_bytes gauge
+mooncake_process_vsize_bytes 886706176
+# HELP mooncake_process_swap_bytes Swapped-out memory of the process
+# TYPE mooncake_process_swap_bytes gauge
+mooncake_process_swap_bytes 0
+# HELP mooncake_jemalloc_enabled 1 when jemalloc statistics are being collected
+# TYPE mooncake_jemalloc_enabled gauge
+mooncake_jemalloc_enabled 0
+# HELP mooncake_jemalloc_allocated_bytes Bytes allocated by the application and not yet freed
+# TYPE mooncake_jemalloc_allocated_bytes gauge
+mooncake_jemalloc_allocated_bytes 0
+# HELP mooncake_jemalloc_active_bytes Bytes in pages backing active allocations
+# TYPE mooncake_jemalloc_active_bytes gauge
+mooncake_jemalloc_active_bytes 0
+# HELP mooncake_jemalloc_metadata_bytes Bytes used by allocator metadata
+# TYPE mooncake_jemalloc_metadata_bytes gauge
+mooncake_jemalloc_metadata_bytes 0
+# HELP mooncake_jemalloc_resident_bytes Bytes in physically resident pages
+# TYPE mooncake_jemalloc_resident_bytes gauge
+mooncake_jemalloc_resident_bytes 0
+# HELP mooncake_jemalloc_retained_bytes Bytes of address space retained but not resident
+# TYPE mooncake_jemalloc_retained_bytes gauge
+mooncake_jemalloc_retained_bytes 0
+# HELP mooncake_jemalloc_mapped_bytes Bytes in extents mapped by the allocator
+# TYPE mooncake_jemalloc_mapped_bytes gauge
+mooncake_jemalloc_mapped_bytes 0
+# HELP mooncake_jemalloc_small_allocated_bytes Allocated bytes served by small size classes
+# TYPE mooncake_jemalloc_small_allocated_bytes gauge
+mooncake_jemalloc_small_allocated_bytes 0
+# HELP mooncake_jemalloc_large_allocated_bytes Allocated bytes served by large size classes
+# TYPE mooncake_jemalloc_large_allocated_bytes gauge
+mooncake_jemalloc_large_allocated_bytes 0
+# HELP mooncake_jemalloc_dirty_bytes Bytes in dirty pages awaiting decay
+# TYPE mooncake_jemalloc_dirty_bytes gauge
+mooncake_jemalloc_dirty_bytes 0
+# HELP mooncake_jemalloc_muzzy_bytes Bytes in muzzy pages awaiting decay
+# TYPE mooncake_jemalloc_muzzy_bytes gauge
+mooncake_jemalloc_muzzy_bytes 0
+# HELP mooncake_jemalloc_arenas Number of arenas the allocator maintains
+# TYPE mooncake_jemalloc_arenas gauge
+mooncake_jemalloc_arenas 0
+# HELP mooncake_jemalloc_background_threads Background decay threads actually running
+# TYPE mooncake_jemalloc_background_threads gauge
+mooncake_jemalloc_background_threads 0
+# HELP mooncake_jemalloc_opt_dirty_decay_ms Configured dirty page decay in ms; -1 never purges
+# TYPE mooncake_jemalloc_opt_dirty_decay_ms gauge
+mooncake_jemalloc_opt_dirty_decay_ms 0
+# HELP mooncake_jemalloc_opt_muzzy_decay_ms Configured muzzy page decay in ms; -1 never purges
+# TYPE mooncake_jemalloc_opt_muzzy_decay_ms gauge
+mooncake_jemalloc_opt_muzzy_decay_ms 0
+# HELP mooncake_jemalloc_dirty_purged_pages_total Dirty pages purged since process start
+# TYPE mooncake_jemalloc_dirty_purged_pages_total counter
+mooncake_jemalloc_dirty_purged_pages_total 0
+# HELP mooncake_jemalloc_muzzy_purged_pages_total Muzzy pages purged since process start
+# TYPE mooncake_jemalloc_muzzy_purged_pages_total counter
+mooncake_jemalloc_muzzy_purged_pages_total 0
+# HELP mooncake_jemalloc_dirty_purge_runs_total Dirty decay purge runs since process start
+# TYPE mooncake_jemalloc_dirty_purge_runs_total counter
+mooncake_jemalloc_dirty_purge_runs_total 0
+# HELP mooncake_jemalloc_muzzy_purge_runs_total Muzzy decay purge runs since process start
+# TYPE mooncake_jemalloc_muzzy_purge_runs_total counter
+mooncake_jemalloc_muzzy_purge_runs_total 0
+# HELP mooncake_jemalloc_dirty_madvises_total madvise calls issued by dirty decay since process start
+# TYPE mooncake_jemalloc_dirty_madvises_total counter
+mooncake_jemalloc_dirty_madvises_total 0
+# HELP mooncake_jemalloc_muzzy_madvises_total madvise calls issued by muzzy decay since process start
+# TYPE mooncake_jemalloc_muzzy_madvises_total counter
+mooncake_jemalloc_muzzy_madvises_total 0
+# HELP mooncake_jemalloc_small_allocations_total Small allocation requests since process start
+# TYPE mooncake_jemalloc_small_allocations_total counter
+mooncake_jemalloc_small_allocations_total 0
+# HELP mooncake_jemalloc_small_deallocations_total Small deallocation requests since process start
+# TYPE mooncake_jemalloc_small_deallocations_total counter
+mooncake_jemalloc_small_deallocations_total 0
+# HELP master_allocated_bytes Total memory bytes currently allocated across all segments
+# TYPE master_allocated_bytes gauge
+master_allocated_bytes 0
+# HELP master_total_capacity_bytes Total memory capacity across all mounted segments
+# TYPE master_total_capacity_bytes gauge
+master_total_capacity_bytes 0
+# HELP master_nof_allocated_bytes Total nof ssd bytes currently allocated across all segments
+# TYPE master_nof_allocated_bytes gauge
+master_nof_allocated_bytes 0
+# HELP master_total_nof_capacity_bytes Total nof ssd capacity across all mounted segments
+# TYPE master_total_nof_capacity_bytes gauge
+master_total_nof_capacity_bytes 0
+# HELP master_allocated_file_size_bytes Total bytes currently allocated for file storage in 3fs/nfs
+# TYPE master_allocated_file_size_bytes gauge
+master_allocated_file_size_bytes 0
+# HELP master_total_file_capacity_bytes Total capacity for file storage in 3fs/nfs
+# TYPE master_total_file_capacity_bytes gauge
+master_total_file_capacity_bytes 0
+# HELP master_dfs_allocated_bytes Total bytes currently allocated by the DFS allocator (shard/bucket mode)
+# TYPE master_dfs_allocated_bytes gauge
+master_dfs_allocated_bytes 0
+# HELP master_dfs_total_capacity_bytes Total capacity of the DFS allocator (shard/bucket mode)
+# TYPE master_dfs_total_capacity_bytes gauge
+master_dfs_total_capacity_bytes 0
+# HELP master_dfs_file_count Number of DFS backing files (shard files in shard mode, bucket files in bucket mode)
+# TYPE master_dfs_file_count gauge
+master_dfs_file_count 0
+# HELP master_key_count Total number of keys managed by the master
+# TYPE master_key_count gauge
+master_key_count 0
+# HELP master_soft_pin_key_count Total number of soft-pinned keys managed by the master
+# TYPE master_soft_pin_key_count gauge
+master_soft_pin_key_count 0
+# HELP master_active_clients Total number of active clients
+# TYPE master_active_clients gauge
+master_active_clients 0
+# HELP master_client_liveness_active_clients Store Client liveness records currently Active
+# TYPE master_client_liveness_active_clients gauge
+master_client_liveness_active_clients 0
+# HELP master_client_liveness_suspected_clients Store Client liveness records currently Suspected
+# TYPE master_client_liveness_suspected_clients gauge
+master_client_liveness_suspected_clients 0
+# HELP master_client_liveness_offline_clients Store Client liveness records currently Offline
+# TYPE master_client_liveness_offline_clients gauge
+master_client_liveness_offline_clients 0
+# HELP master_client_offboarding_queue_depth Queued or running Store Client offboarding jobs
+# TYPE master_client_offboarding_queue_depth gauge
+master_client_offboarding_queue_depth 0
+# HELP master_client_liveness_suspected_transitions_total Store Client Active to Suspected transitions
+# TYPE master_client_liveness_suspected_transitions_total counter
+master_client_liveness_suspected_transitions_total 0
+# HELP master_client_liveness_recoveries_total Store Client Suspected to Active recoveries
+# TYPE master_client_liveness_recoveries_total counter
+master_client_liveness_recoveries_total 0
+# HELP master_client_liveness_offline_transitions_total Store Client Suspected to Offline transitions
+# TYPE master_client_liveness_offline_transitions_total counter
+master_client_liveness_offline_transitions_total 0
+# HELP master_client_offboarding_retries_total Retried Store Client offboarding attempts
+# TYPE master_client_offboarding_retries_total counter
+master_client_offboarding_retries_total 0
+# HELP master_client_offboarding_alerts_total Offboarding retries at or above the operator alert threshold
+# TYPE master_client_offboarding_alerts_total counter
+master_client_offboarding_alerts_total 0
+# HELP master_exist_key_requests_total Total number of ExistKey requests received
+# TYPE master_exist_key_requests_total counter
+master_exist_key_requests_total 0
+# HELP master_exist_key_failures_total Total number of failed ExistKey requests
+# TYPE master_exist_key_failures_total counter
+master_exist_key_failures_total 0
+# HELP master_put_start_requests_total Total number of PutStart requests received
+# TYPE master_put_start_requests_total counter
+master_put_start_requests_total 0
+# HELP master_put_start_failures_total Total number of failed PutStart requests
+# TYPE master_put_start_failures_total counter
+master_put_start_failures_total 0
+# HELP master_put_start_object_already_exists_total Total PutStart requests returning OBJECT_ALREADY_EXISTS
+# TYPE master_put_start_object_already_exists_total counter
+master_put_start_object_already_exists_total 0
+# HELP master_put_start_alloc_failures_total Total number of PutStart failures caused by replica allocation failure
+# TYPE master_put_start_alloc_failures_total counter
+master_put_start_alloc_failures_total 0
+# HELP master_put_start_partial_allocations_total Total number of PutStart requests that succeeded with fewer replicas than requested (best-effort degradation)
+# TYPE master_put_start_partial_allocations_total counter
+master_put_start_partial_allocations_total 0
+# HELP master_put_end_requests_total Total number of PutEnd requests received
+# TYPE master_put_end_requests_total counter
+master_put_end_requests_total 0
+# HELP master_put_end_failures_total Total number of failed PutEnd requests
+# TYPE master_put_end_failures_total counter
+master_put_end_failures_total 0
+# HELP master_put_revoke_requests_total Total number of PutRevoke requests received
+# TYPE master_put_revoke_requests_total counter
+master_put_revoke_requests_total 0
+# HELP master_put_revoke_failures_total Total number of failed PutRevoke requests
+# TYPE master_put_revoke_failures_total counter
+master_put_revoke_failures_total 0
+# HELP master_get_replica_list_requests_total Total number of GetReplicaList requests received
+# TYPE master_get_replica_list_requests_total counter
+master_get_replica_list_requests_total 0
+# HELP master_get_replica_list_failures_total Total number of failed GetReplicaList requests
+# TYPE master_get_replica_list_failures_total counter
+master_get_replica_list_failures_total 0
+# HELP master_get_replica_list_by_regex_requests_total Total number of GetReplicaListByRegex requests received
+# TYPE master_get_replica_list_by_regex_requests_total counter
+master_get_replica_list_by_regex_requests_total 0
+# HELP master_get_replica_list_by_regex_failures_total Total number of failed GetReplicaListByRegex requests
+# TYPE master_get_replica_list_by_regex_failures_total counter
+master_get_replica_list_by_regex_failures_total 0
+# HELP master_remove_requests_total Total number of Remove requests received
+# TYPE master_remove_requests_total counter
+master_remove_requests_total 0
+# HELP master_remove_failures_total Total number of failed Remove requests
+# TYPE master_remove_failures_total counter
+master_remove_failures_total 0
+# HELP master_remove_by_regex_requests_total Total number of RemoveByRegex requests received
+# TYPE master_remove_by_regex_requests_total counter
+master_remove_by_regex_requests_total 0
+# HELP master_remove_by_regex_failures_total Total number of failed RemoveByRegex requests
+# TYPE master_remove_by_regex_failures_total counter
+master_remove_by_regex_failures_total 0
+# HELP master_remove_all_requests_total Total number of Remove all requests received
+# TYPE master_remove_all_requests_total counter
+master_remove_all_requests_total 0
+# HELP master_remove_all_failures_total Total number of failed Remove all requests
+# TYPE master_remove_all_failures_total counter
+master_remove_all_failures_total 0
+# HELP master_mount_segment_requests_total Total number of MountSegment requests received
+# TYPE master_mount_segment_requests_total counter
+master_mount_segment_requests_total 0
+# HELP master_mount_segment_failures_total Total number of failed MountSegment requests
+# TYPE master_mount_segment_failures_total counter
+master_mount_segment_failures_total 0
+# HELP master_unmount_segment_requests_total Total number of UnmountSegment requests received
+# TYPE master_unmount_segment_requests_total counter
+master_unmount_segment_requests_total 0
+# HELP master_unmount_segment_failures_total Total number of failed UnmountSegment requests
+# TYPE master_unmount_segment_failures_total counter
+master_unmount_segment_failures_total 0
+# HELP master_remount_segment_requests_total Total number of RemountSegment requests received
+# TYPE master_remount_segment_requests_total counter
+master_remount_segment_requests_total 0
+# HELP master_remount_segment_failures_total Total number of failed RemountSegment requests
+# TYPE master_remount_segment_failures_total counter
+master_remount_segment_failures_total 0
+# HELP master_ping_requests_total Total number of ping requests received
+# TYPE master_ping_requests_total counter
+master_ping_requests_total 0
+# HELP master_ping_failures_total Total number of failed ping requests
+# TYPE master_ping_failures_total counter
+master_ping_failures_total 0
+# HELP master_copy_start_requests_total Total number of CopyStart requests received
+# TYPE master_copy_start_requests_total counter
+master_copy_start_requests_total 0
+# HELP master_copy_start_failures_total Total number of failed CopyStart requests
+# TYPE master_copy_start_failures_total counter
+master_copy_start_failures_total 0
+# HELP master_copy_end_requests_total Total number of CopyEnd requests received
+# TYPE master_copy_end_requests_total counter
+master_copy_end_requests_total 0
+# HELP master_copy_end_failures_total Total number of failed CopyEnd requests
+# TYPE master_copy_end_failures_total counter
+master_copy_end_failures_total 0
+# HELP master_copy_revoke_requests_total Total number of CopyRevoke requests received
+# TYPE master_copy_revoke_requests_total counter
+master_copy_revoke_requests_total 0
+# HELP master_copy_revoke_failures_total Total number of failed CopyRevoke requests
+# TYPE master_copy_revoke_failures_total counter
+master_copy_revoke_failures_total 0
+# HELP master_move_start_requests_total Total number of MoveStart requests received
+# TYPE master_move_start_requests_total counter
+master_move_start_requests_total 0
+# HELP master_move_start_failures_total Total number of failed MoveStart requests
+# TYPE master_move_start_failures_total counter
+master_move_start_failures_total 0
+# HELP master_move_end_requests_total Total number of MoveEnd requests received
+# TYPE master_move_end_requests_total counter
+master_move_end_requests_total 0
+# HELP master_move_end_failures_total Total number of failed MoveEnd requests
+# TYPE master_move_end_failures_total counter
+master_move_end_failures_total 0
+# HELP master_move_revoke_requests_total Total number of MoveRevoke requests received
+# TYPE master_move_revoke_requests_total counter
+master_move_revoke_requests_total 0
+# HELP master_move_revoke_failures_total Total number of failed MoveRevoke requests
+# TYPE master_move_revoke_failures_total counter
+master_move_revoke_failures_total 0
+# HELP master_evict_disk_replica_requests_total Total number of EvictDiskReplica requests received
+# TYPE master_evict_disk_replica_requests_total counter
+master_evict_disk_replica_requests_total 0
+# HELP master_evict_disk_replica_failures_total Total number of failed EvictDiskReplica requests
+# TYPE master_evict_disk_replica_failures_total counter
+master_evict_disk_replica_failures_total 0
+# HELP master_create_copy_task_requests_total Total number of Copy requests received
+# TYPE master_create_copy_task_requests_total counter
+master_create_copy_task_requests_total 0
+# HELP master_create_copy_task_failures_total Total number of failed Copy requests
+# TYPE master_create_copy_task_failures_total counter
+master_create_copy_task_failures_total 0
+# HELP master_create_move_task_requests_total Total number of Move requests received
+# TYPE master_create_move_task_requests_total counter
+master_create_move_task_requests_total 0
+# HELP master_create_move_task_failures_total Total number of failed Move requests
+# TYPE master_create_move_task_failures_total counter
+master_create_move_task_failures_total 0
+# HELP master_update_task_requests_total Total number of MarkTaskToComplete requests received
+# TYPE master_update_task_requests_total counter
+master_update_task_requests_total 0
+# HELP master_update_task_failures_total Total number of failed MarkTaskToComplete requests
+# TYPE master_update_task_failures_total counter
+master_update_task_failures_total 0
+# HELP master_query_task_requests_total Total number of QueryTask requests received
+# TYPE master_query_task_requests_total counter
+master_query_task_requests_total 0
+# HELP master_query_task_failures_total Total number of failed QueryTask requests
+# TYPE master_query_task_failures_total counter
+master_query_task_failures_total 0
+# HELP master_fetch_tasks_requests_total Total number of FetchTasks requests received
+# TYPE master_fetch_tasks_requests_total counter
+master_fetch_tasks_requests_total 0
+# HELP master_fetch_tasks_failures_total Total number of failed FetchTasks requests
+# TYPE master_fetch_tasks_failures_total counter
+master_fetch_tasks_failures_total 0
+# HELP master_batch_exist_key_requests_total Total number of BatchExistKey requests received
+# TYPE master_batch_exist_key_requests_total counter
+master_batch_exist_key_requests_total 0
+# HELP master_batch_exist_key_failures_total Total number of failed BatchExistKey requests
+# TYPE master_batch_exist_key_failures_total counter
+master_batch_exist_key_failures_total 0
+# HELP master_batch_exist_key_partial_successes_total Total number of partially successful BatchExistKey requests
+# TYPE master_batch_exist_key_partial_successes_total counter
+master_batch_exist_key_partial_successes_total 0
+# HELP master_batch_exist_key_items_total Total number of items processed in BatchExistKey requests
+# TYPE master_batch_exist_key_items_total counter
+master_batch_exist_key_items_total 0
+# HELP master_batch_exist_key_failed_items_total Total number of failed items in BatchExistKey requests
+# TYPE master_batch_exist_key_failed_items_total counter
+master_batch_exist_key_failed_items_total 0
+# HELP master_batch_query_ip_requests_total Total number of BatchQueryIp requests received
+# TYPE master_batch_query_ip_requests_total counter
+master_batch_query_ip_requests_total 0
+# HELP master_batch_query_ip_failures_total Total number of failed BatchQueryIp requests
+# TYPE master_batch_query_ip_failures_total counter
+master_batch_query_ip_failures_total 0
+# HELP master_batch_query_ip_partial_successes_total Total number of partially successful BatchQueryIp requests
+# TYPE master_batch_query_ip_partial_successes_total counter
+master_batch_query_ip_partial_successes_total 0
+# HELP master_batch_query_ip_items_total Total number of items processed in BatchQueryIp requests
+# TYPE master_batch_query_ip_items_total counter
+master_batch_query_ip_items_total 0
+# HELP master_batch_query_ip_failed_items_total Total number of failed items in BatchQueryIp requests
+# TYPE master_batch_query_ip_failed_items_total counter
+master_batch_query_ip_failed_items_total 0
+# HELP master_batch_replica_clear_requests_total Total number of BatchReplicaClear requests received
+# TYPE master_batch_replica_clear_requests_total counter
+master_batch_replica_clear_requests_total 0
+# HELP master_batch_replica_clear_failures_total Total number of failed BatchReplicaClear requests
+# TYPE master_batch_replica_clear_failures_total counter
+master_batch_replica_clear_failures_total 0
+# HELP master_batch_replica_clear_partial_successes_total Total number of partially successful BatchReplicaClear requests
+# TYPE master_batch_replica_clear_partial_successes_total counter
+master_batch_replica_clear_partial_successes_total 0
+# HELP master_batch_replica_clear_items_total Total number of items processed in BatchReplicaClear requests
+# TYPE master_batch_replica_clear_items_total counter
+master_batch_replica_clear_items_total 0
+# HELP master_batch_replica_clear_failed_items_total Total number of failed items in BatchReplicaClear requests
+# TYPE master_batch_replica_clear_failed_items_total counter
+master_batch_replica_clear_failed_items_total 0
+# HELP master_batch_get_replica_list_requests_total Total number of BatchGetReplicaList requests received
+# TYPE master_batch_get_replica_list_requests_total counter
+master_batch_get_replica_list_requests_total 0
+# HELP master_batch_get_replica_list_failures_total Total number of failed BatchGetReplicaList requests
+# TYPE master_batch_get_replica_list_failures_total counter
+master_batch_get_replica_list_failures_total 0
+# HELP master_batch_get_replica_list_partial_successes_total Total number of partially successful BatchGetReplicaList requests
+# TYPE master_batch_get_replica_list_partial_successes_total counter
+master_batch_get_replica_list_partial_successes_total 0
+# HELP master_batch_get_replica_list_items_total Total number of items processed in BatchGetReplicaList requests
+# TYPE master_batch_get_replica_list_items_total counter
+master_batch_get_replica_list_items_total 0
+# HELP master_batch_get_replica_list_failed_items_total Total number of failed items in BatchGetReplicaList requests
+# TYPE master_batch_get_replica_list_failed_items_total counter
+master_batch_get_replica_list_failed_items_total 0
+# HELP master_batch_put_start_requests_total Total number of BatchPutStart requests received
+# TYPE master_batch_put_start_requests_total counter
+master_batch_put_start_requests_total 0
+# HELP master_batch_put_start_failures_total Total number of failed BatchPutStart requests
+# TYPE master_batch_put_start_failures_total counter
+master_batch_put_start_failures_total 0
+# HELP master_batch_put_start_object_already_exists_total Total BatchPutStart response items with OBJECT_ALREADY_EXISTS
+# TYPE master_batch_put_start_object_already_exists_total counter
+master_batch_put_start_object_already_exists_total 0
+# HELP master_batch_put_start_partial_successes_total Total number of partially successful BatchPutStart requests
+# TYPE master_batch_put_start_partial_successes_total counter
+master_batch_put_start_partial_successes_total 0
+# HELP master_batch_put_start_items_total Total number of items processed in BatchPutStart requests
+# TYPE master_batch_put_start_items_total counter
+master_batch_put_start_items_total 0
+# HELP master_batch_put_start_failed_items_total Total number of failed items in BatchPutStart requests
+# TYPE master_batch_put_start_failed_items_total counter
+master_batch_put_start_failed_items_total 0
+# HELP master_batch_put_end_requests_total Total number of BatchPutEnd requests received
+# TYPE master_batch_put_end_requests_total counter
+master_batch_put_end_requests_total 0
+# HELP master_batch_put_end_failures_total Total number of failed BatchPutEnd requests
+# TYPE master_batch_put_end_failures_total counter
+master_batch_put_end_failures_total 0
+# HELP master_batch_put_end_partial_successes_total Total number of partially successful BatchPutEnd requests
+# TYPE master_batch_put_end_partial_successes_total counter
+master_batch_put_end_partial_successes_total 0
+# HELP master_batch_put_end_items_total Total number of items processed in BatchPutEnd requests
+# TYPE master_batch_put_end_items_total counter
+master_batch_put_end_items_total 0
+# HELP master_batch_put_end_failed_items_total Total number of failed items in BatchPutEnd requests
+# TYPE master_batch_put_end_failed_items_total counter
+master_batch_put_end_failed_items_total 0
+# HELP master_batch_put_revoke_requests_total Total number of BatchPutRevoke requests received
+# TYPE master_batch_put_revoke_requests_total counter
+master_batch_put_revoke_requests_total 0
+# HELP master_batch_put_revoke_failures_total Total number of failed BatchPutRevoke requests
+# TYPE master_batch_put_revoke_failures_total counter
+master_batch_put_revoke_failures_total 0
+# HELP master_batch_put_revoke_partial_successes_total Total number of partially successful BatchPutRevoke requests
+# TYPE master_batch_put_revoke_partial_successes_total counter
+master_batch_put_revoke_partial_successes_total 0
+# HELP master_batch_put_revoke_items_total Total number of items processed in BatchPutRevoke requests
+# TYPE master_batch_put_revoke_items_total counter
+master_batch_put_revoke_items_total 0
+# HELP master_batch_put_revoke_failed_items_total Total number of failed items in BatchPutRevoke requests
+# TYPE master_batch_put_revoke_failed_items_total counter
+master_batch_put_revoke_failed_items_total 0
+# HELP mem_cache_hit_nums_ Total number of GetReplicaList results served from the memory pool
+# TYPE mem_cache_hit_nums_ counter
+mem_cache_hit_nums_ 0
+# HELP file_cache_hit_nums_ Total number of GetReplicaList results served from the SSD cache
+# TYPE file_cache_hit_nums_ counter
+file_cache_hit_nums_ 0
+# HELP mem_cache_hit_bytes_total Total bytes of GetReplicaList results served from the memory pool
+# TYPE mem_cache_hit_bytes_total counter
+mem_cache_hit_bytes_total 0
+# HELP file_cache_hit_bytes_total Total bytes of GetReplicaList results served from the SSD cache
+# TYPE file_cache_hit_bytes_total counter
+file_cache_hit_bytes_total 0
+# HELP mem_cache_nums_ Current number of cached values in the memory pool
+# TYPE mem_cache_nums_ gauge
+mem_cache_nums_ 0
+# HELP file_cache_nums_ Current number of cached values in SSD cache
+# TYPE file_cache_nums_ gauge
+file_cache_nums_ 0
+# HELP valid_get_nums_ Total number of GetReplicaList operations that returned at least one completed replica
+# TYPE valid_get_nums_ counter
+valid_get_nums_ 0
+# HELP total_get_nums_ Total number of GetReplicaList operations
+# TYPE total_get_nums_ counter
+total_get_nums_ 0
+# HELP master_successful_evictions_total Total number of successful eviction operations
+# TYPE master_successful_evictions_total counter
+master_successful_evictions_total 0
+# HELP master_attempted_evictions_total Total number of attempted eviction operations
+# TYPE master_attempted_evictions_total counter
+master_attempted_evictions_total 0
+# HELP master_evicted_key_count Total number of keys evicted
+# TYPE master_evicted_key_count counter
+master_evicted_key_count 0
+# HELP master_evicted_size_bytes Total bytes of evicted objects
+# TYPE master_evicted_size_bytes counter
+master_evicted_size_bytes 0
+# HELP master_put_start_discard_cnt Total number of discarded PutStart operations
+# TYPE master_put_start_discard_cnt counter
+master_put_start_discard_cnt 0
+# HELP master_put_start_release_cnt Total number of released PutStart operations
+# TYPE master_put_start_release_cnt counter
+master_put_start_release_cnt 0
+# HELP master_put_start_discarded_staging_size Total size of memory replicas in discarded but not yet released PutStart operations
+# TYPE master_put_start_discarded_staging_size gauge
+master_put_start_discarded_staging_size 0
+# HELP master_promotion_in_flight Current number of in-flight L2->L1 promotion tasks
+# TYPE master_promotion_in_flight gauge
+master_promotion_in_flight 0
+# HELP master_promotion_admitted_total Total promotion tasks admitted past all gates and enqueued
+# TYPE master_promotion_admitted_total counter
+master_promotion_admitted_total 0
+# HELP master_promotion_completed_total Total promotion tasks committed via NotifyPromotionSuccess
+# TYPE master_promotion_completed_total counter
+master_promotion_completed_total 0
+# HELP master_promotion_completed_bytes_total Total bytes promoted from LOCAL_DISK to MEMORY
+# TYPE master_promotion_completed_bytes_total counter
+master_promotion_completed_bytes_total 0
+# HELP master_promotion_expired_total Total promotion tasks expired via the reaper (put_start_release_timeout_sec)
+# TYPE master_promotion_expired_total counter
+master_promotion_expired_total 0
+# HELP master_promotion_failed_total Total promotion tasks aborted by holder via NotifyPromotionFailure (holder reported a downstream failure)
+# TYPE master_promotion_failed_total counter
+master_promotion_failed_total 0
+# HELP master_promotion_cancelled_total Total promotion tasks removed because the prerequisite went away: object removal mid-flight (Remove / UpsertStart / etc.), holder-client expiry (ClearInvalidHandles), or staged replica lost (NotifyPromotionSuccess committed=false)
+# TYPE master_promotion_cancelled_total counter
+master_promotion_cancelled_total 0
+# HELP master_promotion_rejected_frequency_total Promotion attempts rejected because CountMinSketch frequency was below promotion_admission_threshold
+# TYPE master_promotion_rejected_frequency_total counter
+master_promotion_rejected_frequency_total 0
+# HELP master_promotion_rejected_watermark_total Promotion attempts rejected because DRAM was at or above the eviction high watermark
+# TYPE master_promotion_rejected_watermark_total counter
+master_promotion_rejected_watermark_total 0
+# HELP master_promotion_rejected_cap_total Promotion attempts rejected because promotion_in_flight was at promotion_queue_limit
+# TYPE master_promotion_rejected_cap_total counter
+master_promotion_rejected_cap_total 0
+# HELP master_promotion_candidate_recorded_total New promotion retry candidate entries created
+# TYPE master_promotion_candidate_recorded_total counter
+master_promotion_candidate_recorded_total 0
+# HELP master_promotion_candidate_admitted_total Promotion retry candidates successfully queued on background retry
+# TYPE master_promotion_candidate_admitted_total counter
+master_promotion_candidate_admitted_total 0
+# HELP master_promotion_candidate_admission_rejected_total Promotion retry candidates that hit a gate again during retry scan
+# TYPE master_promotion_candidate_admission_rejected_total counter
+master_promotion_candidate_admission_rejected_total 0
+# HELP master_promotion_candidate_expired_evaluated_total Promotion retry candidates expired or exhausted during a retry scan
+# TYPE master_promotion_candidate_expired_evaluated_total counter
+master_promotion_candidate_expired_evaluated_total 0
+# HELP master_promotion_candidate_expired_unevaluated_total Promotion retry candidates that aged out before the background scheduler ever evaluated them (scan budget too small to reach their shard within the TTL window)
+# TYPE master_promotion_candidate_expired_unevaluated_total counter
+master_promotion_candidate_expired_unevaluated_total 0
+# HELP master_promotion_candidate_dropped_limit_total Promotion retry candidates dropped at record time because the global candidate count limit was reached
+# TYPE master_promotion_candidate_dropped_limit_total counter
+master_promotion_candidate_dropped_limit_total 0
+# HELP mooncake_build_info Build version of the running master; the value is always 1 and the version strings are carried by the labels
+# TYPE mooncake_build_info gauge
+mooncake_build_info{display_version="0.3.13 (git: 2b91c1a7)",version="2.0.0"} 1
+# HELP ha_oplog_last_sequence_id Latest OpLog sequence ID written by Primary
+# TYPE ha_oplog_last_sequence_id gauge
+ha_oplog_last_sequence_id 0
+# HELP ha_oplog_applied_sequence_id Latest OpLog sequence ID applied by Standby
+# TYPE ha_oplog_applied_sequence_id gauge
+ha_oplog_applied_sequence_id 0
+# HELP ha_oplog_standby_lag Number of OpLog entries Standby is behind Primary
+# TYPE ha_oplog_standby_lag gauge
+ha_oplog_standby_lag 0
+# HELP ha_oplog_pending_entries Number of out-of-order entries waiting in OpLogApplier
+# TYPE ha_oplog_pending_entries gauge
+ha_oplog_pending_entries 0
+# HELP ha_pending_mutation_queue_size Number of mutations pending etcd write retry
+# TYPE ha_pending_mutation_queue_size gauge
+ha_pending_mutation_queue_size 0
+# HELP ha_standby_state Current state of the Standby service (0=STOPPED, 1=CONNECTING, 2=SYNCING, 3=WATCHING, 4=RECOVERING, 5=RECONNECTING, 6=PROMOTING, 7=PROMOTED, 8=FAILED)
+# TYPE ha_standby_state gauge
+ha_standby_state 0
+# TYPE ha_snapshot_enabled gauge
+ha_snapshot_enabled 0
+# TYPE ha_snapshot_active gauge
+ha_snapshot_active 0
+# TYPE ha_snapshot_latest_present gauge
+ha_snapshot_latest_present 0
+# TYPE ha_snapshot_fallback_present gauge
+ha_snapshot_fallback_present 0
+# TYPE ha_snapshot_latest_age_seconds gauge
+ha_snapshot_latest_age_seconds 0
+# TYPE ha_snapshot_fallback_age_seconds gauge
+ha_snapshot_fallback_age_seconds 0
+# TYPE ha_snapshot_count gauge
+ha_snapshot_count 0
+# TYPE ha_snapshot_candidate_floor gauge
+ha_snapshot_candidate_floor 0
+# TYPE ha_snapshot_floor_advances_total counter
+ha_snapshot_floor_advances_total 0
+# TYPE ha_snapshot_bytes gauge
+ha_snapshot_bytes 0
+# TYPE ha_snapshot_chunk_bytes gauge
+ha_snapshot_chunk_bytes 0
+# TYPE ha_snapshot_chunk_count gauge
+ha_snapshot_chunk_count 0
+# TYPE ha_snapshot_capture_pause_us gauge
+ha_snapshot_capture_pause_us 0
+# TYPE ha_snapshot_suffix_batches gauge
+ha_snapshot_suffix_batches 0
+# TYPE ha_snapshot_catch_up_target_batch gauge
+ha_snapshot_catch_up_target_batch 0
+# TYPE ha_snapshot_catch_up_target_sequence gauge
+ha_snapshot_catch_up_target_sequence 0
+# TYPE ha_snapshot_durable_batch gauge
+ha_snapshot_durable_batch 0
+# TYPE ha_snapshot_applied_batch gauge
+ha_snapshot_applied_batch 0
+# TYPE ha_snapshot_latest_batch gauge
+ha_snapshot_latest_batch 0
+# TYPE ha_snapshot_fallback_batch gauge
+ha_snapshot_fallback_batch 0
+# TYPE ha_snapshot_compaction_floor gauge
+ha_snapshot_compaction_floor 0
+# TYPE ha_snapshot_gc_orphan_prefixes gauge
+ha_snapshot_gc_orphan_prefixes 0
+# TYPE ha_snapshot_gc_deleted_prefixes gauge
+ha_snapshot_gc_deleted_prefixes 0
+# TYPE ha_snapshot_uncompacted_batches gauge
+ha_snapshot_uncompacted_batches 0
+# TYPE ha_snapshot_lease_lost_total counter
+ha_snapshot_lease_lost_total 0
+# TYPE ha_snapshot_skip_reason gauge
+ha_snapshot_skip_reason{reason="none"} 0
+ha_snapshot_skip_reason{reason="disabled"} 1
+ha_snapshot_skip_reason{reason="interval"} 0
+ha_snapshot_skip_reason{reason="in_flight"} 0
+ha_snapshot_skip_reason{reason="stopped"} 0
+ha_snapshot_skip_reason{reason="promotion"} 0
+ha_snapshot_skip_reason{reason="no_new_batch"} 0
+ha_snapshot_skip_reason{reason="catch_up"} 0
+ha_snapshot_skip_reason{reason="lease_busy"} 0
+ha_snapshot_skip_reason{reason="capture_unavailable"} 0
+ha_snapshot_skip_reason{reason="no_fallback"} 0
+ha_snapshot_skip_reason{reason="invalid_pair"} 0
+ha_snapshot_skip_reason{reason="floor_ahead"} 0
+# TYPE ha_snapshot_skips_total counter
+ha_snapshot_skips_total{reason="none"} 0
+ha_snapshot_skips_total{reason="disabled"} 0
+ha_snapshot_skips_total{reason="interval"} 0
+ha_snapshot_skips_total{reason="in_flight"} 0
+ha_snapshot_skips_total{reason="stopped"} 0
+ha_snapshot_skips_total{reason="promotion"} 0
+ha_snapshot_skips_total{reason="no_new_batch"} 0
+ha_snapshot_skips_total{reason="catch_up"} 0
+ha_snapshot_skips_total{reason="lease_busy"} 0
+ha_snapshot_skips_total{reason="capture_unavailable"} 0
+ha_snapshot_skips_total{reason="no_fallback"} 0
+ha_snapshot_skips_total{reason="invalid_pair"} 0
+ha_snapshot_skips_total{reason="floor_ahead"} 0
+# TYPE ha_snapshot_operations_total counter
+# TYPE ha_snapshot_errors_total counter
+# TYPE ha_snapshot_duration_us_total counter
+ha_snapshot_operations_total{operation="schedule"} 0
+ha_snapshot_errors_total{operation="schedule"} 0
+ha_snapshot_duration_us_total{operation="schedule"} 0
+ha_snapshot_operations_total{operation="upload"} 0
+ha_snapshot_errors_total{operation="upload"} 0
+ha_snapshot_duration_us_total{operation="upload"} 0
+ha_snapshot_operations_total{operation="bootstrap"} 0
+ha_snapshot_errors_total{operation="bootstrap"} 0
+ha_snapshot_duration_us_total{operation="bootstrap"} 0
+ha_snapshot_operations_total{operation="replay"} 0
+ha_snapshot_errors_total{operation="replay"} 0
+ha_snapshot_duration_us_total{operation="replay"} 0
+ha_snapshot_operations_total{operation="publish"} 0
+ha_snapshot_errors_total{operation="publish"} 0
+ha_snapshot_duration_us_total{operation="publish"} 0
+ha_snapshot_operations_total{operation="gc"} 0
+ha_snapshot_errors_total{operation="gc"} 0
+ha_snapshot_duration_us_total{operation="gc"} 0
+ha_snapshot_operations_total{operation="prune"} 0
+ha_snapshot_errors_total{operation="prune"} 0
+ha_snapshot_duration_us_total{operation="prune"} 0
+ha_snapshot_operations_total{operation="rebootstrap"} 0
+ha_snapshot_errors_total{operation="rebootstrap"} 0
+ha_snapshot_duration_us_total{operation="rebootstrap"} 0
+# HELP ha_writer_accepting Whether the batch OpLog writer accepts new entries
+# TYPE ha_writer_accepting gauge
+ha_writer_accepting 0
+# HELP ha_writer_retry_count Total writer retries
+# TYPE ha_writer_retry_count counter
+ha_writer_retry_count 0
+# HELP ha_writer_retry_delay_ms Current writer retry delay
+# TYPE ha_writer_retry_delay_ms gauge
+ha_writer_retry_delay_ms 0
+# HELP ha_writer_waiting_slots Current reserved writer slots
+# TYPE ha_writer_waiting_slots gauge
+ha_writer_waiting_slots 0
+# HELP ha_writer_committed_queue_depth Committed writer queue depth
+# TYPE ha_writer_committed_queue_depth gauge
+ha_writer_committed_queue_depth 0
+# HELP ha_writer_callback_queue_depth Callback queue depth
+# TYPE ha_writer_callback_queue_depth gauge
+ha_writer_callback_queue_depth 0
+# HELP ha_writer_last_error Last writer error code
+# TYPE ha_writer_last_error gauge
+ha_writer_last_error 0
+# HELP ha_writer_durable_batch_id Last durable batch ID
+# TYPE ha_writer_durable_batch_id gauge
+ha_writer_durable_batch_id 0
+# HELP ha_writer_durable_sequence Last durable sequence
+# TYPE ha_writer_durable_sequence gauge
+ha_writer_durable_sequence 0
+# HELP ha_writer_stuck_first_sequence First sequence of the in-flight batch awaiting durability; 0 when absent, not a timeout indicator
+# TYPE ha_writer_stuck_first_sequence gauge
+ha_writer_stuck_first_sequence 0
+# HELP ha_writer_stuck_last_sequence Last sequence of the in-flight batch awaiting durability; 0 when absent, not a timeout indicator
+# TYPE ha_writer_stuck_last_sequence gauge
+ha_writer_stuck_last_sequence 0

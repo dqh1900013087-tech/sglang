@@ -1,0 +1,10 @@
+Looking in indexes: http://mirrors.tools.huawei.com/pypi/simple
+Collecting deepseek-recipe
+  Downloading deepseek_recipe-0.2.0-cp310-abi3-manylinux_2_28_aarch64.whl (11.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.4/11.4 MB 5.5 MB/s  0:00:02
+Installing collected packages: deepseek-recipe
+Successfully installed deepseek-recipe-0.2.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+
+[notice] A new release of pip is available: 26.2.1 -> 26.3
+[notice] To update, run: pip install --upgrade pip

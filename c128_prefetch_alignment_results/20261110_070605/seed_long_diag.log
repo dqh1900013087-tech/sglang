@@ -1,0 +1,2 @@
+[2026-11-10 07:20:41 DP0 TP0] C128_PREFETCH_DIAG phase=plan anchor_id=26 anchor_tokens=0 prefetch_tokens=8192 group_tokens=2048 start_mod_group=0 candidate_end_mod_group=0 planned_blocks=4
+[2026-11-10 07:20:42 DP0 TP0] C128_PREFETCH_DIAG phase=query rid=seed_long-7ee749c8 storage_start=0 query_pages=64 kv_hit_pages=0 start_mod_group=0 end_mod_group=0 block_pages=16 planned_c128_keys=4 raw_c128_query_verdict=0

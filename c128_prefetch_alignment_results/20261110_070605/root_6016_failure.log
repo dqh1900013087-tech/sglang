@@ -1,0 +1,155 @@
+[2026-11-10 07:21:11] INFO:     127.0.0.1:39428 - "POST /flush_cache HTTP/1.1" 200 OK
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=plan anchor_id=96 anchor_tokens=0 prefetch_tokens=6016 group_tokens=2048 start_mod_group=0 candidate_end_mod_group=1920 planned_blocks=2
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=query rid=root_6016-b1ae4871 storage_start=0 query_pages=47 kv_hit_pages=47 start_mod_group=0 end_mod_group=1920 block_pages=16 planned_c128_keys=2 raw_c128_query_verdict=2
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=result rid=root_6016-b1ae4871 storage_start=0 expected_tokens=6016 completed_tokens=6016 end_mod_group=1920 sidecar_hit_pages=0 has_saved_sidecar_range=False planned_c128_keys=2 loaded_c128_objects=2 host_slots=32 all_succeeded=True buffer_mode=False assume_stored=False pools=[('swa', 1, 1), ('deepseek_v4_c128', 2, 2), ('deepseek_v4_c4_state', 1, 1), ('deepseek_v4_c4_indexer_state', 1, 1)]
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=insert_host rid=root_6016-b1ae4871 anchor_id=96 inserted_host_node=109 completed_tokens=6016 insert_total_len=6016 duplicate_prefix_len=0 dropped=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=commit_decision target_id=109 target_tokens=6016 end_mod_group=1920 group_tokens=2048 host_slots=32 slots_per_page=16 slot_remainder=0 required_objects=2 loaded_objects=2 existing_host=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=publish target_id=109 target_tokens=6016 group_tokens=2048 end_mod_group=1920 published_slots=32 published_objects=2 unaligned=True
+[2026-11-10 07:21:11 DP0 TP0] HiCache prefetch success req=root_6016-b1ae4871 completed=6016 matched=0 loaded=6016 occupied=0
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:11 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+/workspace/sglang/python/sglang/srt/entrypoints/http_server.py:498: FastAPIDeprecationWarning: ORJSONResponse is deprecated, FastAPI now serializes data directly to JSON bytes via Pydantic when a return type or response model is set, which is faster and doesn't need a custom response class. Read more in the FastAPI docs: https://fastapi.tiangolo.com/advanced/custom-response/#orjson-or-response-model and https://fastapi.tiangolo.com/tutorial/response-model/
+  return await original_handler(ORJSONRequest(request.scope, request.receive))
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12] INFO:     127.0.0.1:39454 - "GET /v1/models HTTP/1.1" 200 OK
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12] INFO:     127.0.0.1:39468 - "GET /v1/models HTTP/1.1" 200 OK
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12] INFO:     127.0.0.1:39482 - "GET /metrics HTTP/1.1" 404 Not Found
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] C128_PREFETCH_DIAG phase=match_validator node_id=109 node_tokens=6016 group_tokens=2048 end_mod_group=1920 accepted=True device_only=False host_present=True device_present=False
+[2026-11-10 07:21:12 DP0 TP0] Scheduler hit an exception: Traceback (most recent call last):
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler.py", line 6798, in run_scheduler_process
+    scheduler.run_event_loop()
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler.py", line 2098, in run_event_loop
+    dispatch_event_loop(self)
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler.py", line 6645, in dispatch_event_loop
+    return _dispatch_event_loop_once(scheduler)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler.py", line 6659, in _dispatch_event_loop_once
+    scheduler.event_loop_overlap()
+  File "/usr/local/python3.12.13/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler.py", line 2210, in event_loop_overlap
+    pop_and_process()
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler.py", line 2163, in pop_and_process
+    self.process_batch_result(tmp_batch, tmp_result)
+  File "/workspace/sglang/python/sglang/srt/observability/scheduler_stage_metrics.py", line 189, in wrapper
+    return profiled_func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/sglang/python/sglang/srt/utils/nvtx_utils.py", line 109, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler.py", line 5599, in process_batch_result
+    self.batch_result_processor.process_batch_result_prefill(batch, result)
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler_components/batch_result_processor.py", line 628, in process_batch_result_prefill
+    self._flush_prefill(
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler_components/batch_result_processor.py", line 349, in _flush_prefill
+    op()
+  File "/workspace/sglang/python/sglang/srt/managers/scheduler_components/request_retirer.py", line 101, in release
+    release_kv_cache(req, self.tree_cache, checkpoint=checkpoint)
+  File "/workspace/sglang/python/sglang/srt/mem_cache/common.py", line 407, in release_kv_cache
+    tree_cache.checkpoint(req, up_to=owned_kv_len)
+  File "/workspace/sglang/python/sglang/srt/mem_cache/unified_radix_cache.py", line 1480, in checkpoint
+    self.checkpoint_into_tree(req, up_to=up_to, **kwargs)
+  File "/workspace/sglang/python/sglang/srt/mem_cache/unified_radix_cache.py", line 1621, in checkpoint_into_tree
+    assert req.kv.cache_protected_len <= len(new_indices) + self.page_size - 1, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: req.kv.cache_protected_len=6016, len(new_indices)=4096, page_aligned_len=4096

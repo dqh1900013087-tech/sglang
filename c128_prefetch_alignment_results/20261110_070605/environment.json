@@ -1,0 +1,9 @@
+{
+  "torch": "2.10.0+cpu",
+  "torch-npu": "2.10.0.post6",
+  "memfabric-hybrid": "1.3.1",
+  "mooncake-transfer-engine": "0.3.12.post1",
+  "sglang": "0.0.0.dev18433+gce0a8fea5.d20261015",
+  "commit": "94ece9916754a44c732ec70df0ea2c0d33ef44b2",
+  "branch": "debug-c128-prefetch-alignment"
+}
