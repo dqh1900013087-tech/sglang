@@ -4,12 +4,14 @@ The full/SWA/C4/C128 KV buffers keep their Ascend-specific PA_ND layout. The
 Compressor state buffers, however, use the same ownership and flat ``state_loc``
 rules as the GPU implementation:
 
-* C4A/C4Li state follows SWA physical pages.
+* A3 C4A/C4Li state follows SWA physical pages. Ascend 950 uses request
+  banks, with separate SWA-owned checkpoints when HiCache is enabled.
 * C128A state follows ``req_pool_idx`` and absolute position.
 
 ``NPUCompressStatePool`` adds the contiguous 3-D view and positive dummy
 location required by the Atlas fused compressor operators. A3 uses explicit
-locations; Ascend 950 uses the same ring storage through its request-bank (cycle) ABI.
+locations; Ascend 950 uses request-bank (cycle) storage without exposing it
+as SWA-addressed HiCache memory.
 There is no paged state allocator or ``cache_mode=1`` compatibility storage.
 """
 
@@ -35,7 +37,7 @@ from sglang.srt.mem_cache.deepseek_v4_memory_pool import (
     DeepSeekV4SingleKVPool,
     DeepSeekV4TokenToKVPool,
 )
-from sglang.srt.runtime_context import get_schedule
+from sglang.srt.runtime_context import get_memory, get_schedule
 
 _NPU_ARCH35_KV_QUANT_GROUP_SIZE = 64
 _NPU_ARCH35_KV_ROW_ALIGNMENT = 128
@@ -105,10 +107,11 @@ class NPUDeepSeekV4SingleKVPool(DeepSeekV4SingleKVPool):
 
 
 class NPUCompressStatePool(CompressStatePool):
-    """Thin Atlas adapter over the shared GPU-style ring state pool.
+    """Atlas ring state with separate A5 HiCache prefix checkpoints.
 
     Allocation, sizing, ring ownership and address translation are inherited
-    from :class:`CompressStatePool`. NPU only requests a contiguous 3-D view,
+    from :class:`CompressStatePool` for A3. A5 HiCache keeps live request banks
+    separate from SWA-page checkpoints. Both use a contiguous 3-D view; NPU
     enforces the FP32 state-cache contract and replaces invalid locations with
     a cleared positive dummy row for explicit-location callers.
 
@@ -130,6 +133,7 @@ class NPUCompressStatePool(CompressStatePool):
         ring_size: int,
         request_scoped: bool,
         swa_page_size: int,
+        checkpoint_size: Optional[int] = None,
     ):
         assert ratio in (
             4,
@@ -156,10 +160,57 @@ class NPUCompressStatePool(CompressStatePool):
         )
         self.dummy_state_loc = self._size - 1
 
+        # A5 computes in request banks. HiCache addresses SWA pages: keep its
+        # immutable prefix checkpoints separate from mutable request state.
+        self.page_checkpoints = None
+        if checkpoint_size is not None:
+            self.page_checkpoints = CompressStatePool(
+                size=checkpoint_size,
+                ring_size=ring_size,
+                overlap=overlap,
+                head_dim=head_dim,
+                dtype=dtype,
+                device=device,
+                enable_memory_saver=enable_memory_saver,
+                ratio=ratio,
+                request_scoped=False,
+                swa_page_size=swa_page_size,
+                state_cache_page_size=ring_size,
+            )
+            self.page_checkpoints.kv_score_buffer.clear()
+            self.kv_score_buffer.clear()
+
         # The shared pool initializes its dummy row. A cold C128 request bank
         # additionally needs every row initialized before its first partial use.
         if ratio == 128:
             self.kv_score_buffer.clear()
+
+    def checkpoint_buffer_info(self):
+        if self.page_checkpoints is not None:
+            return self.page_checkpoints.checkpoint_buffer_info()
+        return super().checkpoint_buffer_info()
+
+    def restore_page_checkpoint(self, request_indices, page_indices):
+        """Restore a prefix into newly assigned request banks; page 0 is cold."""
+        self.state_cache_3d.index_copy_(
+            0,
+            request_indices.long(),
+            self.page_checkpoints.state_cache_3d.index_select(0, page_indices.long()),
+        )
+
+    def save_page_checkpoint(self, request_indices, page_indices, valid=None):
+        """Snapshot page-owned state without aliasing the live request banks."""
+        pages = page_indices.long()
+        target = self.page_checkpoints.state_cache_3d
+        values = self.state_cache_3d.index_select(0, request_indices.long())
+        if valid is not None:
+            # Fixed shapes are required in decode graphs. Invalid/padded rows
+            # retain the cold sentinel instead of overwriting checkpoint page 0.
+            pages = torch.where(valid, pages, torch.zeros_like(pages))
+            values = torch.where(
+                valid[:, None, None], values, target.index_select(0, pages)
+            )
+        target.index_copy_(0, pages, values)
 
     def _replace_invalid_with_dummy(self, state_loc: torch.Tensor) -> torch.Tensor:
         return torch.where(
@@ -302,6 +353,9 @@ class DSV4NPUTokenToKVPool(DeepSeekV4TokenToKVPool):
                 f"sparse-attention operator, got {c128_page_size}"
             )
         self.c128_page_size = c128_page_size
+        self.uses_c4_page_checkpoints = (
+            is_npu_arch35() and get_memory().enable_hierarchical_cache
+        )
         super().__init__(*args, **kwargs)
 
     def _make_kv_pool(
@@ -370,8 +424,13 @@ class DSV4NPUTokenToKVPool(DeepSeekV4TokenToKVPool):
         # explicit-location path can share the smaller flat pool, but the Ascend 950
         # cycle ABI needs enough physical banks for every req_pool_idx.
         size = config.state_size
+        checkpoint_size = None
         if is_npu_arch35():
-            size = max(size, self.num_req_slots * ring_size)
+            if ratio == 4 and get_memory().enable_hierarchical_cache:
+                checkpoint_size = size
+                size = self.num_req_slots * ring_size
+            else:
+                size = max(size, self.num_req_slots * ring_size)
         return NPUCompressStatePool(
             size=size,
             ring_size=ring_size,
@@ -383,6 +442,7 @@ class DSV4NPUTokenToKVPool(DeepSeekV4TokenToKVPool):
             ratio=ratio,
             request_scoped=ratio == 128,
             swa_page_size=self.swa_page_size,
+            checkpoint_size=checkpoint_size,
         )
 
     def _make_indexer_pool(

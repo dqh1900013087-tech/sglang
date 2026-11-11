@@ -20,6 +20,11 @@ from sglang.srt.hardware_backend.npu.attention.ascend_backend import (
     AscendAttnBackend,
     ForwardMetadata,
 )
+from sglang.srt.hardware_backend.npu.dsv4.c4_checkpoint import (
+    build_checkpoint_chunks,
+    checkpoint_completed_pages,
+    forward_prefill_with_checkpoints,
+)
 from sglang.srt.hardware_backend.npu.dsv4.dsv4_rope import Dsv4NpuRoPE, rope_cos_sin
 from sglang.srt.hardware_backend.npu.utils import is_npu_arch35
 from sglang.srt.layers.cp.base import get_cp_strategy
@@ -297,6 +302,10 @@ class CompressorAscendBackendMixin:
             ),
         )
         prefix_cpu = self._extend_prefix_lens_cpu(forward_batch)
+        if getattr(self.token_to_kv_pool, "uses_c4_page_checkpoints", False):
+            fm.dsv4_c4_checkpoint_chunks = build_checkpoint_chunks(
+                cu_cpu, prefix_cpu or [0] * bs, self.token_to_kv_pool.swa_page_size
+            )
         ratio_lists: dict = {
             r: [] for r in self._dsv4_unique_compress_ratios if r in (4, 128)
         }
@@ -528,26 +537,48 @@ class CompressorAscendBackendMixin:
         compressor_op = (
             torch.ops.custom.compressor if is_npu_arch35() else torch.ops.npu.compressor
         )
-        cmp_kv = compressor_op(
-            x,
-            compressor._fused_wkv_w,
-            compressor._fused_wgate_w,
-            state_cache,
-            compressor.ape,
-            compressor._fused_norm_weight_fp32,
-            rope_sin=sin,
-            rope_cos=cos,
+        raw_compressor_op = compressor_op
+
+        def compressor_op(tokens, **kwargs):
+            return raw_compressor_op(
+                tokens,
+                compressor._fused_wkv_w,
+                compressor._fused_wgate_w,
+                state_cache,
+                compressor.ape,
+                compressor._fused_norm_weight_fp32,
+                **kwargs,
+            )
+
+        arguments = dict(
             rope_head_dim=compressor.rope_head_dim,
             cmp_ratio=ratio,
-            state_block_table=state_block_table,
-            cu_seqlens=fm.actual_seq_lengths_q_pa,
-            seqused=fm.seqused,
-            start_pos=fm.start_pos,
             coff=coff,
             norm_eps=compressor.norm.variance_epsilon,
             rotary_mode=2,
             cache_mode=2,
         )
+        page_checkpoints = getattr(state_pool, "page_checkpoints", None)
+        if (
+            page_checkpoints is not None
+            and forward_batch.forward_mode.is_extend_without_speculative()
+        ):
+            cmp_kv = forward_prefill_with_checkpoints(
+                self, state_pool, x, sin, cos, compressor_op, arguments
+            )
+        else:
+            cmp_kv = compressor_op(
+                x,
+                **arguments,
+                rope_sin=sin,
+                rope_cos=cos,
+                state_block_table=state_block_table,
+                cu_seqlens=fm.actual_seq_lengths_q_pa,
+                seqused=fm.seqused,
+                start_pos=fm.start_pos,
+            )
+            if page_checkpoints is not None:
+                checkpoint_completed_pages(self, state_pool)
 
         # prefill output may be padded; trim to loc length
         loc = getattr(fm, f"c{ratio}_loc", None)
