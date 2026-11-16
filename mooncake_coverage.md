@@ -2,13 +2,13 @@
 
 - 审查日期：2026-11-16。
 - 代码基准：`56fa7ca6e7e4004aeb935b6bb38d0acf81340510`（2026-11-13）。
-- 模型范围：[Ascend Model Tutorials](https://docs.sglang.io/docs/hardware-platforms/ascend-npus/model-deployment/tutorials/qwen3_8b) 导航中的 20 个模型，与本仓库 `docs/docs/hardware-platforms/ascend-npus/model-deployment/tutorials/` 对照。
+- 模型范围：[Ascend Model Tutorials](https://docs.sglang.io/docs/hardware-platforms/ascend-npus/model-deployment/tutorials/qwen3_8b) 导航中的 20 个模型，与本仓库 `docs/docs/hardware-platforms/ascend-npus/model-deployment/tutorials/` 对照；另补充 [Supported Models](https://docs.sglang.io/docs/hardware-platforms/ascend-npus/reference/support_models) 中的 `sgl-npu/Kimi-K3-W4A8`，共 21 个。本次只补充 Kimi-K3，未扩展到支持列表中的其他型号。
 - 审查方式：逐模型核对架构入口、设备缓存池、NPU/CPU 搬运、host buffer 导出，以及 Mooncake 注册与存取路径。
 - 验证边界：静态代码审查；未运行 NPU 推理、Mooncake 服务或端到端测试。下文引用的测试是仓库中已有的测试，不表示本次执行通过。
 
 ## 结论与判定口径
 
-20 个模型中，18 个具备有条件的代码接入路径；**MiMo-V2-Flash 和 GLM-5.3-Flash 在当前默认 Ascend HiCache 路径中存在具体阻断**。
+21 个模型中，19 个具备有条件的代码接入路径；**MiMo-V2-Flash 和 GLM-5.3-Flash 在当前默认 Ascend HiCache 路径中存在具体阻断**。新增 Kimi-K3 属于普通 MLA + KDA 混合结构，详见 H；其代码路径支持不代表已经完成该权重版本的 Mooncake L3 实机验证。
 
 “代码路径支持”表示已找到必要缓存状态的设备池、host 池和 L3 存取实现；不等于该型号及所有部署组合均经过实机验证。结论以 DCP=1、常规 KV 格式、兼容的 host layout 为前提，不自动覆盖 MTP、特殊 KV 量化、统一内存、HiSparse、PD decode offload 或其他可选组合。
 
@@ -49,6 +49,7 @@
 | 18 | GLM-5.3-Flash | KDA + DSA | `Glm5NextForConditionalGeneration` | **存在 NPU 设备池 / host 布局 / 搬运接线缺口，见 E** |
 | 19 | MiMo-V2-Flash | SWA GQA + full GQA，K/V 维度不对称 | `MiMoV2FlashForCausalLM` | **非对称 host pool 缺少 NPU 搬运分支，见 F** |
 | 20 | DeepSeek-V4-Flash | CSA + HCA，配合 SWA 和压缩状态 | DeepSeek-V4 专用 attention 与缓存栈 | 专用多池路径支持，见 G |
+| 21 | Kimi-K3（sgl-npu/Kimi-K3-W4A8） | 普通 MLA + KDA + MoE | `KimiK3ForConditionalGeneration` / `KimiK3LinearForCausalLM` | MLA KV + KDA 状态代码路径有条件支持；已有专用测试仅覆盖 L2，见 H |
 
 多模态模型的上述判定针对语言模型前缀 KV / state；不能据此推断视觉编码器特征等其他数据也由同一 L3 路径缓存。
 
@@ -214,6 +215,56 @@ SWA 多池管理和 Mooncake 页存取能力本身存在，具体缺口是 NPU/C
 
 **判定：专用多池代码路径支持。** 必须通过整套 V4 stack 保存和恢复所需状态，不能只备份主 KV 或只依据某一个池的支持情况判断。
 
+## H. Kimi-K3：普通 MLA + KDA 混合路径
+
+**判定：在普通 MLA、非 combined KV buffer、DCP=1 和兼容 host layout 条件下，Ascend + Mooncake L3 具备代码接入路径；未完成 Kimi-K3 的 Mooncake L3 端到端验证。**
+
+目标名称来自本地支持表的 [`sgl-npu/Kimi-K3-W4A8`](docs/docs/hardware-platforms/ascend-npus/reference/support_models.mdx#L341)。以下按仓库的 Kimi-K3 实现分析；本次未取得该权重仓库的 `config.json`，因此不声称已经核验该权重版本的全部配置。部署时仍需确认 architecture、`linear_attn_config` 和是否存在 `index_topk`，尤其不能把 Kimi-K3.1 的 DSA 配置直接套入本节。
+
+### Attention 与必要缓存状态
+
+- [`KimiK3Config`](python/sglang/srt/configs/kimi_k3.py#L87) 将语言模型的 `text_config` 转为 `KimiLinearConfig`；[`kimi_linear_config`](python/sglang/srt/configs/hybrid_arch.py#L99) 能识别这一嵌套配置，将其纳入混合线性 attention 路径。
+- [`KimiK3DecoderLayer`](python/sglang/srt/models/kimi_k3.py#L2974) 按 `is_kda_layer(layer_idx)` 选择 `KimiK3DeltaAttention`，其余层选择 `KimiK3MLAAttention`；后者继承 [`DeepseekV2AttentionMLA`](python/sglang/srt/models/kimi_k3.py#L2546)。具体 KDA 层号由 [`linear_attn_config["kda_layers"]`](python/sglang/srt/configs/kimi_linear.py#L201) 决定，不在本报告中假定固定层数或比例。
+- [`mamba2_cache_params`](python/sglang/srt/configs/kimi_linear.py#L216) 为 KDA 层生成 `KimiLinearCacheParams`。其 [`KimiLinearStateShape`](python/sglang/srt/configs/mamba_utils.py#L299) 包含 recurrent/temporal 矩阵和卷积历史；Q/K/V 的卷积通道合并进 conv state。这里复用 Mamba 缓存接口，不意味着 KDA 就是 GDN 或 Mamba 模型。
+- NPU 后端注册显式选择 [`AscendKDAAttnBackend` 和 `AscendKDAHybridLinearAttnBackend`](python/sglang/srt/layers/attention/attention_registry.py#L603)，实际后端同时读取 [`conv[0]` 和 `temporal`](python/sglang/srt/hardware_backend/npu/attention/ascend_kda_backend.py#L156)。因此，只缓存 MLA KV 不足以恢复 Kimi-K3 前缀。
+
+| 层类型 | 必须保存的数据 | Host 与 L3 路径 |
+| --- | --- | --- |
+| 普通 MLA | latent KV 及 RoPE 数据 | `NPUMLATokenToKVPool` → `MLATokenToKVPoolHost`，采用 `page_first_kv_split` |
+| KDA | recurrent/temporal state + conv state | KimiLinear state pool → `MambaPoolHost`，采用 `page_first_direct`，保存前缀端点状态检查点 |
+
+### NPU 搬运和 Mooncake 存取链路
+
+```text
+Kimi-K3 混合层
+  ├─ MLA KV -> NPU MLA pool -> MLA host pool（page_first_kv_split）
+  └─ KDA temporal + conv -> state pool -> Mamba host pool（page_first_direct）
+        -> HostPoolGroup / HybridCacheController
+        -> Mooncake 主 KV 存取 + MAMBA 附属状态存取
+        -> 仅复用具有匹配状态检查点的完整前缀
+```
+
+1. **设备池接线成立。** [`_hybrid_full_attention_pool_class`](python/sglang/srt/mem_cache/kv_cache_configurator.py#L2848) 对 NPU 上的非 DSA MLA 返回 `NPUMLATokenToKVPool`。其非 combined 模式通过 [`_mla_buffer_info`](python/sglang/srt/hardware_backend/npu/memory_pool_npu.py#L883) 返回 `MLASplitBuffers`，能满足 MLA split host 初始化需要的描述。
+2. **两种 host layout 分别处理。** NPU 参数处理将 MLA 的 `page_first` 转为 [`page_first_kv_split`](python/sglang/srt/hardware_backend/npu/utils.py#L211)；[`_state_host_layout`](python/sglang/srt/mem_cache/hybrid_cache/hybrid_pool_assembler.py#L1103) 则专门把 split layout 转为 KDA/Mamba 所需的 `page_first_direct`。不是要求两种池共用相同的物理布局。
+3. **两类数据均有 NPU/CPU 搬运。** MLA host 的 [`H2D`](python/sglang/srt/mem_cache/pool_host/mla.py#L661) 和 [`D2H`](python/sglang/srt/mem_cache/pool_host/mla.py#L1000)，以及 Mamba host 的 [`H2D`](python/sglang/srt/mem_cache/pool_host/mamba.py#L537) 和 [`D2H`](python/sglang/srt/mem_cache/pool_host/mamba.py#L670)，均有 `kernel_ascend` 分支。
+4. **KDA 状态进入 L3。** [`build_hybrid_mamba_stack`](python/sglang/srt/mem_cache/hybrid_cache/hybrid_pool_assembler.py#L1187) 同时建立 KV 与 Mamba host entries；Mooncake 的 [`register_mem_host_pool_v2`](python/sglang/srt/mem_cache/storage/mooncake_store/mooncake_store.py#L881) 注册附属池。Mamba host 的 [`get_page_buffer_meta`](python/sglang/srt/mem_cache/pool_host/mamba.py#L903) 导出 temporal 和 conv 的真实指针、dtype 对应字节数；Mooncake 按相同顺序生成 [`temporal / conv_*` 对象键](python/sglang/srt/mem_cache/storage/mooncake_store/mooncake_store.py#L1070)，由 [`batch_get_v2 / batch_set_v2`](python/sglang/srt/mem_cache/storage/mooncake_store/mooncake_store.py#L1435) 读写。
+5. **状态与前缀端点绑定。** Mamba 组件的 [`build_hicache_transfers`](python/sglang/srt/mem_cache/unified_cache/components/mamba.py#L1090) 在备份 L3 时用节点末尾 hash 作为状态 key，使用 `TRAILING_PAGES` 命中策略；状态不是逐 token 的普通 KV。混合树的 [`预取结果检查`](python/sglang/srt/mem_cache/unified_radix_cache.py#L3155) 要求主 KV 和所需附属状态完整匹配，否则丢弃该次预取，不能只因 MLA 命中就复用缺失 KDA 状态的前缀。
+
+### 与 GLM-5.3-Flash 的区别及限制
+
+两者都包含 KDA，但 full-attention 一侧不同：本节 Kimi-K3 是普通 MLA；GLM-5.3-Flash 是 DSA，会先命中 E 节所述的通用 DSA 池分支。不能将 E 节的结论按“KDA”标签直接套给 Kimi-K3。反过来，[`is_deepseek_dsa` / `is_kimi_k31`](python/sglang/srt/configs/model_config.py#L198) 会将带 `index_topk` 的特定 Kimi linear/K3.1 architecture 判为 DSA；这种配置需要重新沿 DSA 分支审查，不在本节支持结论内。
+
+- **MLA host 使用 `page_first_kv_split`，DCP=1。** 可请求 `--hicache-mem-layout page_first`，由 NPU 参数处理转换；`layer_first_kv_split` 缺少当前 L3 页元数据导出，DCP>1 的 split-KV L3 则被 [`get_page_buffer_meta`](python/sglang/srt/mem_cache/pool_host/mla.py#L1109) 显式拒绝。
+- **排除 combined KV 特殊组合。** [`use_combined_kv_buffer`](python/sglang/srt/mem_cache/kv_cache_configurator.py#L447) 在 `SGLANG_NPU_USE_FLASH_MLA=true`、DSPARK 且非 draft worker 时开启，返回 tensor tuple 而非上述 `MLASplitBuffers`；不能据普通 split 路径宣称这一组合兼容 HiCache。MTP/draft 状态也需要单独验收。
+- **保持 KDA 状态完整。** [`INT8 Mamba checkpoint 与 HiCache 互斥`](python/sglang/srt/arg_groups/mamba_hook.py#L74)；若额外注册 slot side states，当前 Mamba zero-copy 元数据接口会拒绝。W4A8 是权重量化，不能替代对 KV/state dtype 的检查。
+- **仅审查语言模型缓存。** 视觉编码器特征、PD 传输及其他多模态数据不由上述结论覆盖。
+
+### 已有证据与待验收项
+
+仓库有专用手工测试 [`TestKimiK3MixedWithHiCacheL2`](test/manual/hicache/test_npu_kimi_k3_hicache.py#L8)，使用 Kimi-K3 W4A8 int-MoE 权重、Ascend attention、BF16 和 `kernel_ascend`，并配置 `max_mamba_cache_size`。但它没有设置 `--hicache-storage-backend mooncake`，只覆盖混合部署的 L2 场景；不能把测试文件的存在当作执行成功，更不能当作目标权重的 Mooncake L3 验收。
+
+后续实机验证需在相同输入下比较无缓存重算与 L3 恢复：先将 MLA KV、KDA temporal 和 conv 状态写入 Mooncake，再驱逐 L1/L2，确认真实 storage hit 和输出一致性。还应单独制造 KDA 状态对象缺失，检查预取丢弃与重算，以及不同检查点边界的恢复行为。本次仅完成静态链路核对。
+
 ## 使用条件与明确限制
 
 | 项目 | 当前代码结论 | 依据 |
@@ -241,6 +292,7 @@ W8A8/W4A8 等权重量化不等于 KV cache 量化。特殊 KV dtype、scale buf
 | [`test_npu_hierarchical_cache_ttft_mha.py`](test/registered/npu/basic_function/HiCache/test_npu_hierarchical_cache_ttft_mha.py) | 存在 Qwen3-32B NPU HiCache 测试 | 不能等同于该型号所有量化、并行组合的 L3 验证 |
 | [`test_npu_hierarchical_cache_mla.py`](test/registered/npu/basic_function/HiCache/test_npu_hierarchical_cache_mla.py) | 存在 DeepSeek-R1 NPU HiCache 测试 | 不能直接覆盖 DSA、MTP indexer 或 Mooncake L3 |
 | [`test_npu_hicache_mamba.py`](test/registered/npu/basic_function/HiCache/test_npu_hicache_mamba.py) | Qwen3.5-0.8B + NPU + file backend 的 L3 状态恢复测试 | 不是 5 个目标 GDN 型号各自的 Mooncake 端到端测试 |
+| [`test_npu_kimi_k3_hicache.py`](test/manual/hicache/test_npu_kimi_k3_hicache.py) | 存在 Kimi-K3 MLA + KDA 的 NPU HiCache L2 手工测试 | 未配置 Mooncake storage backend，不能证明 Kimi-K3 Mooncake L3 已通过 |
 | [`test_npu_hicache_sparse_dispatch.py`](test/registered/unit/mem_cache/test_npu_hicache_sparse_dispatch.py) | NPU MLA / sparse host 搬运分派与 buffer 绑定测试 | Mock / 单元测试不代表真实设备及网络传输成功 |
 | [`test_dsv4_hicache_l2.py`](test/registered/unit/mem_cache/test_dsv4_hicache_l2.py) | V4 host pool 和 NPU 布局相关单元覆盖 | 不是完整模型端到端性能与正确性验证 |
 | [`test_dsv4_hicache_l3.py`](test/registered/unit/mem_cache/test_dsv4_hicache_l3.py) | C128 L3 边界、恢复及清理相关覆盖 | 不是 V4-Flash + NPU + Mooncake 的实机验收 |
