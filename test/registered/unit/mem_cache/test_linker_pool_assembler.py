@@ -242,6 +242,81 @@ def _dsv4_pool(pool_type, **fields):
 
 
 class TestHybridDevicePoolAssembler(CustomTestCase):
+    def test_npu_mla_resolves_kv_and_sparse_indexer_device_pages(self):
+        from sglang.srt.hardware_backend.npu.memory_pool_npu import NPUMLATokenToKVPool
+        from sglang.srt.mem_cache.device_pool_info import MLASplitBuffers
+
+        k = torch.zeros((3, 6, 4, 1, 5), dtype=torch.bfloat16)
+        v = torch.zeros((3, 6, 4, 1, 2), dtype=torch.bfloat16)
+        index = torch.zeros((2, 6, 4, 1, 7), dtype=torch.float8_e4m3fn)
+        scales = torch.zeros((2, 6, 4, 1), dtype=torch.float32)
+        buffers = MLASplitBuffers(
+            k=k,
+            v=v,
+            index_k=index,
+            index_scales=scales,
+            index_layer_indices=(0, 2),
+            k_width=5,
+            v_width=2,
+            index_width=7,
+        )
+        kvcache = Mock(spec=NPUMLATokenToKVPool)
+        kvcache.page_size = kvcache.index_page_size = 4
+        kvcache.layer_num = 3
+        kvcache.dcp_size = kvcache.index_kpool = 1
+        kvcache.enable_sparsity_driven_kv_offload = False
+        kvcache.storage_rank_replicated = True
+        kvcache.indexer_kv_store_int8 = False
+        kvcache.layer_router = SimpleNamespace(
+            sub_pool=lambda _: None, sub_pools=lambda: (), wrapped_view=lambda: None
+        )
+        kvcache.get_device_pool_infos.return_value = (
+            SimpleNamespace(buffer_info=SimpleNamespace(buffers=buffers)),
+        )
+        with patch(
+            "sglang.srt.mem_cache.hybrid_cache.linker_pool_assembler.get_memory",
+            return_value=SimpleNamespace(
+                unified_cache_external_linker_backend="mooncake"
+            ),
+        ):
+            group = resolve_hybrid_device_pool_group(
+                kvcache=kvcache,
+                page_size=4,
+                params=SimpleNamespace(mtp_draft_device_pools=()),
+                components={ComponentType.FULL},
+            )
+
+        self.assertTrue(group.rank_replicated)
+        transfers = group.resolve_transfers(
+            [
+                PoolTransfer(
+                    name=PoolName.KV,
+                    keys=["page-3", "page-1"],
+                    device_indices=torch.tensor([12, 13, 14, 15, 4, 5, 6, 7]),
+                )
+            ]
+        )
+        self.assertEqual([t.name for t in transfers], [PoolName.KV, PoolName.INDEXER])
+        for transfer, parts in zip(transfers, ((k, v), (index, scales))):
+            entry = group.entry_map[transfer.name]
+            ptrs, sizes = entry.get_page_buffer_meta(transfer.host_indices)
+            expected = [
+                layer[page] for page in (3, 1) for part in parts for layer in part
+            ]
+            self.assertEqual(ptrs, [page.data_ptr() for page in expected])
+            self.assertEqual(sizes, [page.nbytes for page in expected])
+
+        entry = group.entry_map[PoolName.INDEXER]
+        self.assertIsNone(entry.get_prepared_layer_range_meta([3], 1))
+        self.assertEqual(
+            entry.get_prepared_layer_range_meta([3], 2),
+            (
+                [[index[1, 3].data_ptr(), scales[1, 3].data_ptr()]],
+                [[index[1, 3].nbytes, scales[1, 3].nbytes]],
+                [[index[0, 3].nbytes, 2 * index[0, 3].nbytes + scales[0, 3].nbytes]],
+            ),
+        )
+
     def test_deepseek_v4_maps_sparse_sidecars(self):
         from sglang.srt.mem_cache.deepseek_v4_compress_state import (
             CompressStatePool,

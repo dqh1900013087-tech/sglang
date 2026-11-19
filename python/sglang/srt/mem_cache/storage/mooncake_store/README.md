@@ -59,6 +59,30 @@ until every rank stops writing, then discard them without publishing. Pending
 slots count toward GPU capacity. Reset and shutdown drain reads before freeing slots.
 The deprecated HiCache extra config is used only when linker JSON is omitted.
 
+#### Ascend GLM-5.2
+
+To use Mooncake directly from the Ascend device KV pool, add these options to
+the GLM-5.2 launch command:
+
+```bash
+--enable-unified-cache-external-linker \
+--unified-cache-external-linker-backend mooncake \
+--unified-cache-external-linker-config '{"load_mode":"prefetch","protocol":"ascend","master_server_address":"HOST:50051","global_segment_size":0,"standalone_storage":false}'
+```
+
+Use an Ascend-capable Mooncake build with multi-buffer put/get support and a
+Mooncake Store reachable from the NPU device buffers over the Ascend transport.
+The example assumes a separate store provider contributes the storage memory.
+This path supports the native split MLA/DSA pool with DCP=1 and no speculative
+draft KV. Omit the NEXTN options from the GLM-5.2 launch example. For replicated
+MLA/DSA pools, attention TP rank 0 writes to Mooncake and each rank prefetches
+the shared objects into its own device slots. An explicitly enabled INT8
+indexer keeps rank-local objects. DSA restoration requires both the KV object
+and the indexer object for each page when the pool has indexer layers.
+To verify L3 reuse, start with `--enable-cache-report`, populate the store, then
+repeat a sufficiently long prompt with a cold L1 and check for nonzero storage
+cache hits.
+
 ### Decode context parallelism (DCP)
 
 Mooncake L3 supports DCP for one materialized MLA KV pool and optional KDA

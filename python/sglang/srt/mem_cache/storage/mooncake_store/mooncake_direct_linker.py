@@ -118,6 +118,8 @@ def _storage_sharing(
 
 
 class MooncakeDirectLinker(UnifiedCacheLinker):
+    _npu_device: torch.device | None = None
+
     def __init__(
         self,
         server_args,
@@ -139,6 +141,9 @@ class MooncakeDirectLinker(UnifiedCacheLinker):
         )
         self.pools = self.pool_group.entry_map
         self.num_layers = self.pool_group.num_layers
+        kv_pool = self.pools.get(PoolName.KV)
+        if kv_pool is not None and kv_pool.kv_buffer[0].device.type == "npu":
+            self._npu_device = kv_pool.kv_buffer[0].device
 
         tp_rank = 0
         tp_size = get_parallel().tp_size
@@ -157,6 +162,10 @@ class MooncakeDirectLinker(UnifiedCacheLinker):
             1, int(extra_config.get("linker_load_threads", DEFAULT_LOAD_THREADS))
         )
         self.load_mode = extra_config.pop("load_mode", "layer_wise")
+        if self._npu_device is not None and self.load_mode != "prefetch":
+            raise ValueError(
+                'NPU Mooncake direct linking requires "load_mode": "prefetch".'
+            )
         # TODO: unlike `HiCacheController._generate_storage_config`, this sets no
         # `dp_rank`. Aligning the storage-config producers changes persisted
         # storage keys, so it waits for a storage-key format change.
@@ -178,7 +187,11 @@ class MooncakeDirectLinker(UnifiedCacheLinker):
                 MooncakeStore,
             )
 
-            self.storage = MooncakeStore(storage_config, mem_pool=None)
+            self.storage = MooncakeStore(
+                storage_config,
+                mem_pool=None,
+                npu_device_buffers=self._npu_device is not None,
+            )
         else:
             self.storage = storage
         self.storage.mem_pool_host = self.pool_group
@@ -189,6 +202,21 @@ class MooncakeDirectLinker(UnifiedCacheLinker):
             attn_cp_rank=params.attn_cp_rank,
             pp_rank=params.pp_rank,
         )
+        if self._npu_device is not None:
+            # Separate incompatible page formats without tying keys to pool capacity.
+            layout = tuple(
+                (
+                    name.value,
+                    tuple(sorted(pool.layer_mapping.items())),
+                    tuple(
+                        (str(buf.dtype), tuple(buf.shape[1:])) for buf in pool.kv_buffer
+                    ),
+                )
+                for name, pool in self.pools.items()
+            )
+            layout = (getattr(kvcache, "use_fia_nz", False), layout)
+            signature = hashlib.sha256(repr(layout).encode()).hexdigest()[:16]
+            storage_suffix = f"npu_v1_tp{tp_size}_{signature}_{storage_suffix}"
         self.storage.mla_suffix = storage_suffix
         self.storage.mha_suffix = storage_suffix
         self.storage.pool_suffixes, self.offload_pools, tp_shared = _storage_sharing(
@@ -275,7 +303,7 @@ class MooncakeDirectLinker(UnifiedCacheLinker):
                 result = self.storage.store.register_buffer(*allocation)
                 if result not in (0, None):
                     raise RuntimeError(
-                        "Failed to register GPU KV buffer with Mooncake, "
+                        "Failed to register device KV buffer with Mooncake, "
                         f"error code: {result}."
                     )
 
@@ -436,6 +464,8 @@ class MooncakeDirectLinker(UnifiedCacheLinker):
                 if prefetch and not completion.set_running_or_notify_cancel():
                     continue
                 try:
+                    if self._npu_device is not None:
+                        device_module.set_device(self._npu_device)
                     if prefetch:
                         ready.synchronize()
                         completion.set_result(self.load_all_layers(pending))
@@ -640,6 +670,8 @@ class MooncakeDirectLinker(UnifiedCacheLinker):
                 if task is None:
                     return
                 expanded, tokens, ready, session_id = task
+                if self._npu_device is not None:
+                    device_module.set_device(self._npu_device)
                 ready.synchronize()
                 extra_info = (
                     HiCacheStorageExtraInfo(extra_info={"session_id": session_id})
