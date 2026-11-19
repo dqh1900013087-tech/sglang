@@ -515,7 +515,11 @@ class MooncakeStore(HiCacheStorage, MooncakeBaseStore):
         return total
 
     def __init__(
-        self, storage_config: HiCacheStorageConfig = None, mem_pool: HostKVCache = None
+        self,
+        storage_config: HiCacheStorageConfig = None,
+        mem_pool: HostKVCache = None,
+        *,
+        npu_device_buffers: bool = False,
     ):
         MooncakeBaseStore.__init__(self)
         self.dcp_size = storage_config.dcp_size if storage_config is not None else 1
@@ -530,6 +534,24 @@ class MooncakeStore(HiCacheStorage, MooncakeBaseStore):
             self.store = MooncakeDistributedStore()
 
             self.config = self._load_config(storage_config)
+            if npu_device_buffers:
+                if self.config.protocol != "ascend" or self.config.standalone_storage:
+                    raise ValueError(
+                        "NPU direct linking requires the Mooncake ascend transport "
+                        "with standalone_storage=false."
+                    )
+                if self._replicate_config_cls is None:
+                    raise RuntimeError(
+                        "NPU direct linking requires Mooncake ReplicateConfig."
+                    )
+                for method in (
+                    "batch_put_from_multi_buffers",
+                    "batch_get_into_multi_buffers",
+                ):
+                    if not callable(getattr(self.store, method, None)):
+                        raise RuntimeError(
+                            f"NPU direct linking requires Mooncake Store {method}."
+                        )
             extra_config = (
                 getattr(storage_config, "extra_config", None)
                 if storage_config

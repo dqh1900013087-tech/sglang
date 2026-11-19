@@ -393,12 +393,104 @@ def _build_kv_device_pool_group(
 ) -> DevicePoolGroup:
     from sglang.srt.mem_cache.memory_pool import DSATokenToKVPool
 
-    if not isinstance(kvcache, DSATokenToKVPool):
+    if isinstance(kvcache, DSATokenToKVPool):
+        return _build_dsa_device_pool_group(kvcache, page_size, mtp_draft_device_pools)
+
+    from sglang.srt.hardware_backend.npu.memory_pool_npu import NPUMLATokenToKVPool
+
+    if isinstance(kvcache, NPUMLATokenToKVPool):
+        if get_memory().unified_cache_external_linker_backend != "mooncake":
+            raise ValueError("NPU MLA direct linking requires the Mooncake backend.")
+        if mtp_draft_device_pools:
+            raise ValueError("NPU MLA direct linking does not support MTP draft KV.")
+        return _build_npu_mla_device_pool_group(kvcache, page_size)
+    raise ValueError(
+        "The direct external linker supports only DSA and NPU MLA among single "
+        f"KV pools, got {type(kvcache).__name__}."
+    )
+
+
+def _build_npu_mla_device_pool_group(kvcache: Any, page_size: int) -> DevicePoolGroup:
+    from sglang.srt.mem_cache.device_pool_info import MLASplitBuffers
+
+    if kvcache.dcp_size != 1:
+        raise ValueError("NPU MLA direct linking requires --dcp-size 1.")
+    if kvcache.page_size != page_size:
+        raise ValueError("NPU MLA KV page size must match the tree page size.")
+    if kvcache.index_kpool != 1 or kvcache.enable_sparsity_driven_kv_offload:
         raise ValueError(
-            "The direct external linker supports only DSA among single KV "
-            f"pools, got {type(kvcache).__name__}."
+            "NPU MLA direct linking requires indexer and KV pages in the same "
+            "slot space, without KPool or sparsity-driven KV offload."
         )
-    return _build_dsa_device_pool_group(kvcache, page_size, mtp_draft_device_pools)
+
+    (info,) = kvcache.get_device_pool_infos()
+    buffers = info.buffer_info.buffers
+    if not isinstance(buffers, MLASplitBuffers) or buffers.k is None:
+        raise ValueError("NPU MLA direct linking requires native split KV buffers.")
+
+    num_layers = kvcache.layer_num
+    kv_buffers = [buf for buf in (buffers.k, buffers.v) if buf is not None and buf.numel()]
+    indexer_layer_mapping = {
+        layer: slot for slot, layer in enumerate(buffers.index_layer_indices)
+    }
+    indexer_buffers = []
+    if indexer_layer_mapping:
+        if (
+            kvcache.index_page_size != page_size
+            or buffers.index_k is None
+            or buffers.index_k.numel() == 0
+        ):
+            raise ValueError("NPU indexer pages must match the tree page size.")
+        indexer_buffers.append(buffers.index_k)
+        if buffers.index_scales is not None and buffers.index_scales.numel():
+            indexer_buffers.append(buffers.index_scales)
+
+    # Native tensors are [layer slot, physical page, slot within page, ...].
+    for name, pool_buffers, layer_count in (
+        (PoolName.KV, kv_buffers, num_layers),
+        (PoolName.INDEXER, indexer_buffers, len(indexer_layer_mapping)),
+    ):
+        for buf in pool_buffers:
+            if (
+                buf.ndim < 3
+                or buf.shape[0] != layer_count
+                or buf.shape[2] != page_size
+                or not buf.is_contiguous()
+            ):
+                raise ValueError(f"Unsupported NPU direct linker layout for {name}.")
+
+    entries = [
+        DevicePoolEntry(
+            name=PoolName.KV,
+            indices_from_pool=PoolName.KV,
+            device_pool=kvcache,
+            components=[buf.unbind(0) for buf in kv_buffers],
+            layer_mapping={layer: layer for layer in range(num_layers)},
+            page_size=page_size,
+            rows_are_pages=True,
+        )
+    ]
+    if indexer_buffers:
+        entries.append(
+            DevicePoolEntry(
+                name=PoolName.INDEXER,
+                indices_from_pool=PoolName.KV,
+                device_pool=kvcache,
+                components=[buf.unbind(0) for buf in indexer_buffers],
+                layer_mapping=indexer_layer_mapping,
+                page_size=page_size,
+                rows_are_pages=True,
+            )
+        )
+    # Follow HiCache's MLA replication contract. The optional INT8 indexer
+    # is not supported by that path, so it retains rank-local objects here.
+    return DevicePoolGroup(
+        entries,
+        num_layers,
+        page_size,
+        rank_replicated=kvcache.storage_rank_replicated
+        and not kvcache.indexer_kv_store_int8,
+    )
 
 
 def _build_dsa_device_pool_group(
