@@ -636,7 +636,7 @@ class Scheduler(
         if (t := envs.SGLANG_TEST_STUCK_SCHEDULER_INIT.get()) > 0:
             time.sleep(t)
 
-        # Initialize HCCL and custom AiCPU before the L3 backend maps Host memory.
+        # Test HCCL before L3 setup and custom AiCPU after L3 setup.
         prewarm_before_cache = self.server_args.hicache_storage_backend in (
             "npu_memcache",
             "mooncake",
@@ -675,6 +675,9 @@ class Scheduler(
                 else None
             ),
         )
+        if prewarm_before_cache:
+            self.maybe_init_dsv4_aicpu_prewarm()
+
         self.is_hybrid_swa = result.is_hybrid_swa
         self.is_hybrid_ssm = result.is_hybrid_ssm
         self.sliding_window_size = result.sliding_window_size
@@ -864,16 +867,24 @@ class Scheduler(
             device_module=tp_group.device_module,
         )
         logger.info("HCCL DP prewarm done: rank=%s", rank)
-        if self.server_args.hicache_storage_backend in ("npu_memcache", "mooncake"):
-            from sglang.srt.hardware_backend.npu.attention.ascend_dsv4_backend import (
-                prewarm_dsv4_aicpu,
-            )
 
-            logger.info("DSV4 AiCPU prewarm start: rank=%s", rank)
-            prewarm_dsv4_aicpu(
-                self.tp_worker.model_runner.attn_backend, tp_group.device
-            )
-            logger.info("DSV4 AiCPU prewarm done: rank=%s", rank)
+    def maybe_init_dsv4_aicpu_prewarm(self) -> None:
+        model_runner = self.tp_worker.model_runner
+        if not (_is_npu and is_deepseek_v4(model_runner.model_config.hf_config)):
+            return
+
+        from sglang.srt.hardware_backend.npu.attention.ascend_dsv4_backend import (
+            prewarm_dsv4_aicpu,
+        )
+
+        parallel = get_parallel()
+        tp_group = parallel.tp_group
+        rank = (
+            parallel.dp_rank if parallel.dp_rank is not None else tp_group.rank_in_group
+        )
+        logger.info("DSV4 AiCPU prewarm start: rank=%s", rank)
+        prewarm_dsv4_aicpu(model_runner.attn_backend, tp_group.device)
+        logger.info("DSV4 AiCPU prewarm done: rank=%s", rank)
 
     def init_zbal_on_npu(self):
         if _is_npu:
