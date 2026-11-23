@@ -636,7 +636,7 @@ class Scheduler(
         if (t := envs.SGLANG_TEST_STUCK_SCHEDULER_INIT.get()) > 0:
             time.sleep(t)
 
-        # Initialize HCCL and custom AiCPU before the L3 backend maps Host memory.
+        # Test custom AiCPU before HCCL, with both before L3 setup.
         prewarm_before_cache = self.server_args.hicache_storage_backend in (
             "npu_memcache",
             "mooncake",
@@ -857,13 +857,6 @@ class Scheduler(
         rank = (
             parallel.dp_rank if parallel.dp_rank is not None else tp_group.rank_in_group
         )
-        logger.info("HCCL DP prewarm start: rank=%s", rank)
-        _prewarm_hccl_group(
-            device=tp_group.device,
-            group=tp_group.device_group,
-            device_module=tp_group.device_module,
-        )
-        logger.info("HCCL DP prewarm done: rank=%s", rank)
         if self.server_args.hicache_storage_backend in ("npu_memcache", "mooncake"):
             from sglang.srt.hardware_backend.npu.attention.ascend_dsv4_backend import (
                 prewarm_dsv4_aicpu,
@@ -874,6 +867,14 @@ class Scheduler(
                 self.tp_worker.model_runner.attn_backend, tp_group.device
             )
             logger.info("DSV4 AiCPU prewarm done: rank=%s", rank)
+
+        logger.info("HCCL DP prewarm start: rank=%s", rank)
+        _prewarm_hccl_group(
+            device=tp_group.device,
+            group=tp_group.device_group,
+            device_module=tp_group.device_module,
+        )
+        logger.info("HCCL DP prewarm done: rank=%s", rank)
 
     def init_zbal_on_npu(self):
         if _is_npu:
