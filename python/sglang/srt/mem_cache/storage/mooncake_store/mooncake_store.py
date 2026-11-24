@@ -367,6 +367,11 @@ class MooncakeBaseStore:
         if size == 0:
             # conv-only models have a 0-element ssm state; nothing to register
             return
+        logger.info(
+            "HiCache host registration: backend=mooncake host_ptr=%#x size_bytes=%d",
+            ptr,
+            size,
+        )
         ret_code = self.store.register_buffer(ptr, size)
         if ret_code != 0:
             logger.error(f"Failed to register buffer, error code: {ret_code}")

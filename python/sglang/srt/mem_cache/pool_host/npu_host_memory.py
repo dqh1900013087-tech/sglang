@@ -278,6 +278,11 @@ class AclHostMemoryBackend(NpuHostMemoryBackend):
                 "with host_memory.register_acl_host_memory (AIV kv_exchange "
                 "needs aclrt-registered host blocks)"
             ) from exc
+        logger.info(
+            "HiCache host registration: backend=acl host_ptr=%#x size_bytes=%d",
+            tensor.data_ptr(),
+            tensor.numel() * tensor.element_size(),
+        )
         register_acl_host_memory(tensor)
 
     def alloc(
