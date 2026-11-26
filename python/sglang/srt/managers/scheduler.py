@@ -636,13 +636,8 @@ class Scheduler(
         if (t := envs.SGLANG_TEST_STUCK_SCHEDULER_INIT.get()) > 0:
             time.sleep(t)
 
-        # Initialize HCCL and custom AiCPU before the L3 backend maps Host memory.
-        prewarm_before_cache = self.server_args.hicache_storage_backend in (
-            "npu_memcache",
-            "mooncake",
-        )
-        if prewarm_before_cache:
-            self.maybe_init_hccl_dp_prewarm()
+        # Finish DSV4 warmup before the cache builder can register L3 host memory.
+        self.maybe_init_hccl_dp_prewarm()
 
         # Init cache and memory pool
         self.init_kv_event_lora_names()
@@ -700,8 +695,6 @@ class Scheduler(
                     self.tp_worker.model_runner.forward_stream
                 )
         self.emit_metrics_constants()
-        if not prewarm_before_cache:
-            self.maybe_init_hccl_dp_prewarm()
 
         if (c := self.tp_worker.model_runner.canary_manager) is not None:
             c.attach_radix_cache(self.tree_cache)
